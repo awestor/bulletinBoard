@@ -2,11 +2,11 @@ package ru.daniil.bulletinBoard.service.user;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import ru.daniil.bulletinBoard.entity.Role;
-import ru.daniil.bulletinBoard.entity.User;
+import ru.daniil.bulletinBoard.entity.base.user.Role;
+import ru.daniil.bulletinBoard.entity.base.user.User;
 import ru.daniil.bulletinBoard.enums.RoleName;
-import ru.daniil.bulletinBoard.repository.RoleRepository;
-import ru.daniil.bulletinBoard.repository.UserRepository;
+import ru.daniil.bulletinBoard.repository.user.RoleRepository;
+import ru.daniil.bulletinBoard.repository.user.UserRepository;
 
 import java.time.LocalDate;
 

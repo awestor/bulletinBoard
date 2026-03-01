@@ -1,7 +1,7 @@
 package ru.daniil.bulletinBoard.service.user;
 
 import org.springframework.stereotype.Service;
-import ru.daniil.bulletinBoard.entity.User;
+import ru.daniil.bulletinBoard.entity.base.user.User;
 import ru.daniil.bulletinBoard.entity.request.RegistrationRequest;
 
 
@@ -25,9 +25,9 @@ public interface UserService {
 
     /**
      * Получает пользователя из если он авторизован
-     * @return объект сущности пользователя или null
+     * @return объект сущности пользователя или ошибка
      */
-    Optional<User> getAuthUser();
+    User getAuthUser();
 
     /**
      * Проверяет существование пользователя по email

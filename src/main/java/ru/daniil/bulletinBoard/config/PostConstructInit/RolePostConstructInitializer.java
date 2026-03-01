@@ -3,9 +3,9 @@ package ru.daniil.bulletinBoard.config.PostConstructInit;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import ru.daniil.bulletinBoard.entity.Role;
+import ru.daniil.bulletinBoard.entity.base.user.Role;
 import ru.daniil.bulletinBoard.enums.RoleName;
-import ru.daniil.bulletinBoard.repository.RoleRepository;
+import ru.daniil.bulletinBoard.repository.user.RoleRepository;
 
 @Component
 public class RolePostConstructInitializer {

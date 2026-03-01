@@ -1,4 +1,4 @@
-package ru.daniil.bulletinBoard.entity;
+package ru.daniil.bulletinBoard.entity.base.user;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;

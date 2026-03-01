@@ -8,7 +8,9 @@ import jakarta.validation.constraints.Size;
 public class RegistrationRequest {
 
     @NotBlank(message = "Email обязателен")
-    @Email(message = "Некорректный формат email")
+    @Email(message = "Некорректный формат email",
+            regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$")
+    @Pattern(regexp = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", message = "Email должен содержать @ и домен")
     private String email;
 
     @NotBlank(message = "Логин обязателен")

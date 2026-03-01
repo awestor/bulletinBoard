@@ -1,15 +1,18 @@
 package ru.daniil.bulletinBoard.service.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.daniil.bulletinBoard.entity.User;
+import ru.daniil.bulletinBoard.entity.base.user.User;
 import ru.daniil.bulletinBoard.entity.request.RegistrationRequest;
-import ru.daniil.bulletinBoard.repository.UserRepository;
+import ru.daniil.bulletinBoard.repository.user.UserRepository;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -59,16 +62,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getAuthUser(){
+    public User getAuthUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getPrincipal())) {
-            return Optional.empty();
+            throw new AuthenticationException("Пользователь не авторизован") {};
         }
 
-        User userDetails = (User) authentication.getPrincipal();
-        return Optional.ofNullable(userDetails);
+        return (User) authentication.getPrincipal();
     }
 
     @Override

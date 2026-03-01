@@ -1,9 +1,9 @@
-package ru.daniil.bulletinBoard.repository;
+package ru.daniil.bulletinBoard.repository.user;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
-import ru.daniil.bulletinBoard.entity.User;
+import ru.daniil.bulletinBoard.entity.base.user.User;
 
 import java.util.Optional;
 
