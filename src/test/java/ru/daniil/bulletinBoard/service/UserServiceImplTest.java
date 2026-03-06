@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.daniil.bulletinBoard.entity.base.user.User;
-import ru.daniil.bulletinBoard.entity.request.RegistrationRequest;
+import ru.daniil.bulletinBoard.entity.request.auth.RegistrationRequest;
 import ru.daniil.bulletinBoard.repository.user.UserRepository;
 import ru.daniil.bulletinBoard.service.user.UserServiceImpl;
 
@@ -226,20 +226,20 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findByLogin_WhenExists_ShouldReturnUser() {
+    void getByLogin_WhenExists_ShouldReturnUser() {
         when(userRepository.findByLogin("testuser")).thenReturn(Optional.of(user));
 
-        Optional<User> result = userService.findByLogin("testuser");
+        Optional<User> result = userService.getByLogin("testuser");
 
         assertTrue(result.isPresent());
         assertEquals(user, result.get());
     }
 
     @Test
-    void findByLogin_WhenNotExists_ShouldReturnEmpty() {
+    void getByLogin_WhenNotExists_ShouldReturnEmpty() {
         when(userRepository.findByLogin("unknown")).thenReturn(Optional.empty());
 
-        Optional<User> result = userService.findByLogin("unknown");
+        Optional<User> result = userService.getByLogin("unknown");
 
         assertTrue(result.isEmpty());
     }

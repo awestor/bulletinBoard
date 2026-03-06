@@ -1,4 +1,4 @@
-package ru.daniil.bulletinBoard.config.PostConstructInit;
+package ru.daniil.bulletinBoard.config.postConstructInit;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.annotation.Order;

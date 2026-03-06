@@ -1,4 +1,4 @@
-package ru.daniil.bulletinBoard.entity.request;
+package ru.daniil.bulletinBoard.entity.request.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +14,6 @@ public class RegistrationRequest {
     @NotBlank(message = "Email обязателен")
     @Email(message = "Некорректный формат email",
             regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$")
-    @Pattern(regexp = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", message = "Email должен содержать @ и домен")
     private String email;
 
     @NotBlank(message = "Логин обязателен")

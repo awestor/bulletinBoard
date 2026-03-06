@@ -84,7 +84,7 @@ public class User implements UserDetails {
     @SuppressWarnings("NullableProblems")
     @Override
     public String getUsername() {
-        return email;
+        return login;
     }
 
     @Override

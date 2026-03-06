@@ -6,10 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.daniil.bulletinBoard.entity.base.user.User;
-import ru.daniil.bulletinBoard.entity.request.RegistrationRequest;
+import ru.daniil.bulletinBoard.entity.request.auth.RegistrationRequest;
 import ru.daniil.bulletinBoard.repository.user.UserRepository;
 
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(RegistrationRequest request) {
+    public UserDetails registerUser(RegistrationRequest request) {
         validateUserData(request.getEmail(), request.getPassword(), request.getLogin());
 
         User user = new User(
@@ -41,7 +42,7 @@ public class UserServiceImpl implements UserService {
                 passwordEncoder.encode(request.getPassword())
         );
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     private void validateUserData(String email, String password, String login) {
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findByLogin(String login) {
+    public Optional<User> getByLogin(String login) {
         return userRepository.findByLogin(login);
     }
 }

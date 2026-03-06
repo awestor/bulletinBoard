@@ -1,8 +1,9 @@
 package ru.daniil.bulletinBoard.service.user;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.daniil.bulletinBoard.entity.base.user.User;
-import ru.daniil.bulletinBoard.entity.request.RegistrationRequest;
+import ru.daniil.bulletinBoard.entity.request.auth.RegistrationRequest;
 
 import java.util.Optional;
 
@@ -13,14 +14,14 @@ public interface UserService {
      * @param login логин пользователя
      * @return Пользователь или null
      */
-    Optional<User> findByLogin(String login);
+    Optional<User> getByLogin(String login);
 
     /**
      * Регистрирует нового пользователя в системе и назначает ему права роли "USER"
      *
      * @param request RegistrationRequest что содержит регистрационные данные
      */
-    void registerUser(RegistrationRequest request);
+    UserDetails registerUser(RegistrationRequest request);
 
     /**
      * Получает пользователя из если он авторизован
