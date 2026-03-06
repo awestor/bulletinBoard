@@ -66,7 +66,7 @@ public class PaymentInfoServiceImpl implements PaymentInfoService{
                         String.format("Оплата с id %d - не найдена", id)
                 ));
 
-        existingPayment.setStatus(status.toString());
+        existingPayment.setStatus(status);
 
         return paymentInfoRepository.save(existingPayment);
     }
@@ -74,7 +74,7 @@ public class PaymentInfoServiceImpl implements PaymentInfoService{
     @Override
     @Transactional
     public PaymentInfoResponse updatePaymentStatus(PaymentInfo item, String status) {
-        item.setStatus(status);
+        item.setStatus(PaymentStatus.valueOf(status));
         return convertToResponse(paymentInfoRepository.save(item));
     }
 
@@ -97,7 +97,7 @@ public class PaymentInfoServiceImpl implements PaymentInfoService{
 
     private PaymentInfoResponse convertToResponse(PaymentInfo item){
         PaymentInfoResponse result = new PaymentInfoResponse(item.getOrderNumber(), null,
-                item.getTotalPrice(), item.getStatus());
+                item.getTotalPrice(), item.getStatus().toString());
         if (item.getMethod() != null) {
             result.setPaymentMethodType(item.getMethod().getType());
         }

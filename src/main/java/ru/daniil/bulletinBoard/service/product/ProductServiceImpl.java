@@ -7,7 +7,6 @@ import ru.daniil.bulletinBoard.entity.base.product.Product;
 import ru.daniil.bulletinBoard.entity.base.product.ProductAttribute;
 import ru.daniil.bulletinBoard.entity.base.product.ProductImage;
 import ru.daniil.bulletinBoard.entity.request.CreateProductRequest;
-
 import ru.daniil.bulletinBoard.repository.product.ProductRepository;
 import ru.daniil.bulletinBoard.service.product.attribute.ProductAttributeService;
 import ru.daniil.bulletinBoard.service.product.image.ProductImageService;
@@ -80,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Продукт не найден"));
 
-        if (request.getCategoryId() != null && !request.getCategoryId().equals(product.getCategoryId())) {
+        if (request.getCategoryId() != null && !request.getCategoryId().equals(product.getCategory().getId())) {
 
             if (!newCategory.isLeaf()) {
                 throw new RuntimeException("Продукт не может быть назначен в не конечную категорию");

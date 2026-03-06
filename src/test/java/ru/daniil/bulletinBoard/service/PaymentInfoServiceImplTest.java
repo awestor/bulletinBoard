@@ -46,7 +46,7 @@ class PaymentInfoServiceImplTest {
         paymentInfo = new PaymentInfo("ORD-123", new BigDecimal("100.00"));
         paymentInfo.setId(1L);
         paymentInfo.setMethod(paymentMethod);
-        paymentInfo.setStatus(PaymentStatus.PROCESSING.toString());
+        paymentInfo.setStatus(PaymentStatus.PROCESSING);
     }
 
     @Test
@@ -155,7 +155,7 @@ class PaymentInfoServiceImplTest {
 
         PaymentInfo result = paymentInfoService.updatePayment(1L, PaymentStatus.COMPLETED);
 
-        assertEquals(PaymentStatus.COMPLETED.toString(), result.getStatus());
+        assertEquals(PaymentStatus.COMPLETED.toString(), result.getStatus().toString());
         verify(paymentInfoRepository).save(paymentInfo);
     }
 
@@ -176,7 +176,7 @@ class PaymentInfoServiceImplTest {
 
         PaymentInfoResponse result = paymentInfoService.updatePaymentStatus(paymentInfo, "COMPLETED");
 
-        assertEquals("COMPLETED", paymentInfo.getStatus());
+        assertEquals("COMPLETED", paymentInfo.getStatus().toString());
         assertEquals("COMPLETED", result.getStatus());
         verify(paymentInfoRepository).save(paymentInfo);
     }

@@ -1,5 +1,9 @@
 package ru.daniil.bulletinBoard.entity.base.product;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import ru.daniil.bulletinBoard.entity.base.discount.Discount;
 import ru.daniil.bulletinBoard.enums.ProductStatus;
 
@@ -10,6 +14,10 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tbl_products")
+@Data
+@Builder
+@AllArgsConstructor
+@EqualsAndHashCode(exclude = {"attributes"})
 public class Product {
 
     @Id
@@ -42,8 +50,8 @@ public class Product {
     @Column(name = "stock_quantity")
     private Integer stockQuantity;
 
-    @Column
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
@@ -70,38 +78,14 @@ public class Product {
         this.name = name;
         this.price = price;
         this.priceAtTime = price;
-        this.status = ProductStatus.ACTIVE.toString();
+        this.status = ProductStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getCategoryId() {
-        return category.getId();
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
     }
 
     public void setPrice(BigDecimal price) {
         this.price = price;
         updatePriceAtTime();
-    }
-
-    public BigDecimal getPriceAtTime() {
-        return priceAtTime;
     }
 
     public void applyDiscount(Discount discount) {
@@ -125,21 +109,9 @@ public class Product {
         }
     }
 
-    public Integer getStockQuantity() {
-        return stockQuantity;
-    }
-
-    public void setStockQuantity(Integer stockQuantity) {
-        this.stockQuantity = stockQuantity;
-    }
-
     public void addAttribute(String key, String value) {
         ProductAttribute attribute = new ProductAttribute(this, key, value);
         this.attributes.add(attribute);
-    }
-
-    public void addAttribute(String key, Object value) {
-        addAttribute(key, String.valueOf(value));
     }
 
     public String getAttribute(String key) {
@@ -163,40 +135,8 @@ public class Product {
         this.attributes = attributes;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    public Set<ProductAttribute> getAttributes() {
-        return attributes;
     }
 }

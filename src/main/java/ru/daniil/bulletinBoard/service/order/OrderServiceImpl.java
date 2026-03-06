@@ -1,7 +1,6 @@
 package ru.daniil.bulletinBoard.service.order;
 
 import jakarta.transaction.Transactional;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -60,7 +59,7 @@ public class OrderServiceImpl implements OrderService{
         if (lastOrder.isEmpty()) {
             return create(user);
         }
-        if (Objects.equals(lastOrder.get().getStatus(), OrderStatus.PAID.toString())) {
+        if (Objects.equals(lastOrder.get().getStatus(), OrderStatus.PAID)) {
             return create(user);
         }
 
@@ -82,7 +81,7 @@ public class OrderServiceImpl implements OrderService{
     public void delete(Long orderId) {
         Order order = getById(orderId);
 
-        if (!order.getStatus().equals(OrderStatus.DRAFT.toString())) {
+        if (!order.getStatus().equals(OrderStatus.DRAFT)) {
             throw new RuntimeException("Завершённые заказы невозможно удалить");
         }
 

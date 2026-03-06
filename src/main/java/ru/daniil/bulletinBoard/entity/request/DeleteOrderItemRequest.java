@@ -3,7 +3,11 @@ package ru.daniil.bulletinBoard.entity.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
+import lombok.Data;
 
+@Data
+@Builder
 public class DeleteOrderItemRequest {
     @NotBlank(message = "SKU товара не может быть пустым")
     @Size(min = 3, max = 20, message = "SKU должно содержать от 3 до 20 символов")
@@ -14,14 +18,6 @@ public class DeleteOrderItemRequest {
     }
 
     public DeleteOrderItemRequest(String sku) {
-        this.sku = sku;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
         this.sku = sku;
     }
 }

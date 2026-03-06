@@ -1,6 +1,9 @@
 package ru.daniil.bulletinBoard.entity.base.discount;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import ru.daniil.bulletinBoard.enums.DiscountType;
 
 import java.math.BigDecimal;
@@ -8,6 +11,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tbl_discounts")
+@Data
+@Builder
+@AllArgsConstructor
 public class Discount {
 
     @Id
@@ -67,45 +73,5 @@ public class Discount {
         this.endDate = endDate;
         this.usageLimit = usageLimit;
         this.type = type.toString();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public Integer getUsageLimit() {
-        return usageLimit;
-    }
-
-    public Integer getUsageCount() {
-        return usageCount;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public BigDecimal getPercentage() {
-        return percentage;
-    }
-
-    public BigDecimal getFixedAmount() {
-        return fixedAmount;
-    }
-
-    public Long getApplicableCategoryId() {
-        return applicableCategoryId;
-    }
-
-    public String getType() {
-        return type;
     }
 }

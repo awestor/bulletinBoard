@@ -46,7 +46,7 @@ class ProductImageServiceImplTest {
         productImage = new ProductImage();
         productImage.setId(1L);
         productImage.setPath("test.jpg");
-        productImage.setMain(false);
+        productImage.setIsMain(false);
     }
 
     @Test

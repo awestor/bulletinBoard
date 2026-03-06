@@ -106,8 +106,8 @@ class OrderItemServiceImplTest {
 
     @Test
     void updateItemQuantity_ShouldUpdateQuantity() {
-        LocalDateTime reservationTime = LocalDateTime.now().plusMinutes(20);
-        when(orderItemRepository.updateQuantity(1L, 3, reservationTime)).thenReturn(1);
+        when(orderItemRepository.updateQuantity(eq(1L), eq(3), any(LocalDateTime.class)))
+                .thenReturn(1);
 
         orderItem.setQuantity(3);
         orderItemService.updateItemQuantity(orderItem);

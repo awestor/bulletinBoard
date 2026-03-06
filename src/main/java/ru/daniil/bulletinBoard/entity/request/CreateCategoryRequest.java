@@ -3,8 +3,14 @@ package ru.daniil.bulletinBoard.entity.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import ru.daniil.bulletinBoard.enums.CategoryType;
 
+@Data
+@Builder
+@AllArgsConstructor
 public class CreateCategoryRequest {
     @NotBlank(message = "Название категории обязательно для заполнения")
     @Size(min = 2, max = 100, message = "Название категории должно содержать от 2 до 100 символов")
@@ -18,35 +24,6 @@ public class CreateCategoryRequest {
 
     private Long parentId;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public CategoryType getType() {
-        return type;
-    }
-
-    public void setType(CategoryType type) {
-        this.type = type;
-    }
-
-    public Long getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
+    public CreateCategoryRequest() {
     }
 }

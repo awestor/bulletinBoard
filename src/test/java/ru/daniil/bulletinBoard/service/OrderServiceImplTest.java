@@ -47,13 +47,13 @@ class OrderServiceImplTest {
         order = new Order(user);
         order.setId(1L);
         order.setOrderNumber("ORD-123");
-        order.setStatus(OrderStatus.DRAFT.toString());
+        order.setStatus(OrderStatus.DRAFT);
         order.setTotalPrice(new BigDecimal("100.00"));
 
         paidOrder = new Order(user);
         paidOrder.setId(2L);
         paidOrder.setOrderNumber("ORD-456");
-        paidOrder.setStatus(OrderStatus.PAID.toString());
+        paidOrder.setStatus(OrderStatus.PAID);
     }
 
     @Test
@@ -63,7 +63,7 @@ class OrderServiceImplTest {
         Order result = orderService.create(user);
 
         assertNotNull(result);
-        assertEquals(OrderStatus.DRAFT.toString(), result.getStatus());
+        assertEquals(OrderStatus.DRAFT, result.getStatus());
         verify(orderRepository).save(any(Order.class));
     }
 

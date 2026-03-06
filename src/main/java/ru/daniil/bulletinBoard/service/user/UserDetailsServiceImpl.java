@@ -5,9 +5,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.daniil.bulletinBoard.repository.user.UserRepository;
-
 import ru.daniil.bulletinBoard.entity.base.user.User;
+import ru.daniil.bulletinBoard.repository.user.UserRepository;
 
 
 @Service

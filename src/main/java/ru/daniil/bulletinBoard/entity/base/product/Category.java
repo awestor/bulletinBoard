@@ -1,13 +1,21 @@
 package ru.daniil.bulletinBoard.entity.base.product;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import ru.daniil.bulletinBoard.enums.CategoryType;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "tbl_categories")
+@Data
+@Builder
+@AllArgsConstructor
 public class Category {
 
     @Id
@@ -60,46 +68,6 @@ public class Category {
         this.parent = parent;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public CategoryType getType() {
-        return type;
-    }
-
-    public void setType(CategoryType type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Category getParent() {
-        return parent;
-    }
-
-    public void setParent(Category parent) {
-        this.parent = parent;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public boolean isLeaf() {
         return type == CategoryType.LEAF;
     }
@@ -132,8 +100,6 @@ public class Category {
         }
         return parent.getFullPath() + " > " + name;
     }
-
-    public List<Product> getProducts() { return products; }
 
     public void setProducts(List<Product> products) {
         if (!isLeaf()) {

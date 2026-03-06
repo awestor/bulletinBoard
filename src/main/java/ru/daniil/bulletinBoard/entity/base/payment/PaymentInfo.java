@@ -1,6 +1,9 @@
 package ru.daniil.bulletinBoard.entity.base.payment;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import ru.daniil.bulletinBoard.enums.PaymentStatus;
 
 import java.math.BigDecimal;
@@ -8,6 +11,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tbl_payment_info")
+@Data
+@Builder
+@AllArgsConstructor
 public class PaymentInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,14 +29,14 @@ public class PaymentInfo {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
-    @Column
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 
     @Column
     private LocalDateTime createdAt;
 
     public PaymentInfo() {
-        this.status = PaymentStatus.PROCESSING.toString();
+        this.status = PaymentStatus.PROCESSING;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -39,49 +45,5 @@ public class PaymentInfo {
         this.orderNumber = orderNumber;
         this.totalPrice = totalPrice;
         this.method = null;
-    }
-
-    public PaymentMethod getMethod() {
-        return method;
-    }
-
-    public void setMethod(PaymentMethod method) {
-        this.method = method;
-    }
-
-    public String getOrderNumber() {
-        return orderNumber;
-    }
-
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
     }
 }

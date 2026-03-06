@@ -1,7 +1,11 @@
 package ru.daniil.bulletinBoard.entity.request;
 
 import jakarta.validation.constraints.*;
+import lombok.Builder;
+import lombok.Data;
 
+@Data
+@Builder
 public class CreateOrderItemRequest {
     @NotBlank(message = "SKU товара не может быть пустым")
     @Size(min = 3, max = 20, message = "SKU должно содержать от 3 до 20 символов")
@@ -18,22 +22,6 @@ public class CreateOrderItemRequest {
 
     public CreateOrderItemRequest(String sku, Integer quantity) {
         this.sku = sku;
-        this.quantity = quantity;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 }

@@ -3,7 +3,11 @@ package ru.daniil.bulletinBoard.entity.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
+import lombok.Data;
 
+@Data
+@Builder
 public class CompletePaymentInfoRequest {
     @NotBlank(message = "Номер заказа обязателен")
     @Size(max = 50, message = "Номер заказа не должен превышать 28 characters")
@@ -22,30 +26,6 @@ public class CompletePaymentInfoRequest {
                                       String status) {
         this.orderNumber = orderNumber;
         this.paymentMethodType = paymentMethodType;
-        this.status = status;
-    }
-
-    public String getOrderNumber() {
-        return orderNumber;
-    }
-
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    public String getPaymentMethodType() {
-        return paymentMethodType;
-    }
-
-    public void setPaymentMethodType(String paymentMethodType) {
-        this.paymentMethodType = paymentMethodType;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
         this.status = status;
     }
 }

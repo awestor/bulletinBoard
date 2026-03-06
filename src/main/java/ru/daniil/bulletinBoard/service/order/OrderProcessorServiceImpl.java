@@ -101,7 +101,7 @@ public class OrderProcessorServiceImpl implements OrderProcessorService {
             BigDecimal priceWithoutDisc = priceAtTime.multiply(BigDecimal.valueOf(item.getQuantity()));
             BigDecimal maxDiscount = BigDecimal.ZERO;
 
-            List<OrderDiscount> categoryDiscounts = discountsByCategory.get(product.getCategoryId());
+            List<OrderDiscount> categoryDiscounts = discountsByCategory.get(product.getCategory().getId());
             if (categoryDiscounts != null) {
                 for (OrderDiscount discount : categoryDiscounts) {
                     Discount discountObj = discount.getDiscount();

@@ -1,6 +1,9 @@
 package ru.daniil.bulletinBoard.entity.base.discount;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import ru.daniil.bulletinBoard.entity.base.order.Order;
 
 import java.math.BigDecimal;
@@ -10,6 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tbl_order_discounts",
         uniqueConstraints = @UniqueConstraint(columnNames = {"order_id", "discount_id"}))
+@Data
+@Builder
+@AllArgsConstructor
 public class OrderDiscount {
 
     @Id
@@ -52,13 +58,5 @@ public class OrderDiscount {
                     .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
         }
         return discount.getFixedAmount() != null ? discount.getFixedAmount() : BigDecimal.ZERO;
-    }
-
-    public BigDecimal getDiscountAmount() {
-        return discountAmount;
-    }
-
-    public Discount getDiscount() {
-        return discount;
     }
 }

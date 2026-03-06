@@ -1,11 +1,15 @@
 package ru.daniil.bulletinBoard.entity.request;
 
 import jakarta.validation.constraints.*;
+import lombok.Builder;
+import lombok.Data;
 import ru.daniil.bulletinBoard.enums.DiscountType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Data
+@Builder
 public class DiscountRequest {
     @NotBlank(message = "Discount code is required")
     @Pattern(regexp = "^[A-Z0-9_-]{3,50}$",

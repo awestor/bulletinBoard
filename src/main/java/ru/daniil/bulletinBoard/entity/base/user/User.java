@@ -1,17 +1,26 @@
 package ru.daniil.bulletinBoard.entity.base.user;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.daniil.bulletinBoard.enums.RoleName;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tbl_user")
+@Data
+@Builder
+@AllArgsConstructor
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +45,7 @@ public class User implements UserDetails {
     private LocalDate blockedUntil;
 
     @Column(name = "trading_blocked", nullable = false)
-    private boolean tradingBlocked = false;
+    private boolean tradingBlocked;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -44,10 +53,12 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles;
 
     public User() {
         this.createdAt = LocalDateTime.now();
+        tradingBlocked = false;
+        roles = new HashSet<>();
     }
 
     public User(String email, String login, String password) {
@@ -70,22 +81,10 @@ public class User implements UserDetails {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     @SuppressWarnings("NullableProblems")
     @Override
     public String getUsername() {
         return email;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
     }
 
     @Override
@@ -108,65 +107,9 @@ public class User implements UserDetails {
         return isAccountNonLocked();
     }
 
-    public boolean isTradingBlocked() {
-        return tradingBlocked;
-    }
-
     public boolean hasRole(RoleName roleName) {
         return roles.stream()
                 .anyMatch(role -> Objects.equals(role.getName(), roleName.toString()));
-    }
-
-    public String getImageName() {
-        return imageName;
-    }
-
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
-    }
-
-    public LocalDate getBlockedUntil() {
-        return blockedUntil;
-    }
-
-    public void setBlockedUntil(LocalDate blockedUntil) {
-        this.blockedUntil = blockedUntil;
-    }
-
-    public void setTradingBlocked(boolean tradingBlocked) {
-        this.tradingBlocked = tradingBlocked;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
     }
 
     public void addRole(Role role) {

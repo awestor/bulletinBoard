@@ -1,6 +1,9 @@
 package ru.daniil.bulletinBoard.entity.base.order;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import ru.daniil.bulletinBoard.entity.base.product.Product;
 
 import java.math.BigDecimal;
@@ -9,6 +12,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tbl_order_items",
         uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "order_id"}))
+@Data
+@Builder
+@AllArgsConstructor
 public class OrderItem {
 
     @Id
@@ -46,24 +52,8 @@ public class OrderItem {
         return LocalDateTime.now().plusMinutes(20);
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(reservedUntil);
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
     }
 
     public void setQuantity(Integer quantity) {
@@ -71,26 +61,6 @@ public class OrderItem {
             throw new IllegalArgumentException("Количество товаров в позиции заказа должно быть больше нуля");
         }
         this.quantity = quantity;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public BigDecimal getPriceAtTime() {
-        return priceAtTime;
-    }
-
-    public void setPriceAtTime(BigDecimal priceAtTime) {
-        this.priceAtTime = priceAtTime;
     }
 
     @PreUpdate

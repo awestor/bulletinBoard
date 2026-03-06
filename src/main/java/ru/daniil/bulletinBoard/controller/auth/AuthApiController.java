@@ -3,7 +3,10 @@ package ru.daniil.bulletinBoard.controller.auth;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.daniil.bulletinBoard.entity.request.RegistrationRequest;
 import ru.daniil.bulletinBoard.service.user.UserService;
 

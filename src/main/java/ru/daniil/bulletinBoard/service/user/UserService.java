@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import ru.daniil.bulletinBoard.entity.base.user.User;
 import ru.daniil.bulletinBoard.entity.request.RegistrationRequest;
 
-
 import java.util.Optional;
 
 @Service
