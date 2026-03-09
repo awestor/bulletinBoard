@@ -3,12 +3,13 @@ package ru.daniil.bulletinBoard.config.postConstructInit;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import ru.daniil.bulletinBoard.entity.base.user.User;
 import ru.daniil.bulletinBoard.enums.RoleName;
 import ru.daniil.bulletinBoard.repository.user.RoleRepository;
 import ru.daniil.bulletinBoard.repository.user.UserRepository;
 
-
+@Component
 public class FirstUserPostConstructInitializer {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;

@@ -11,43 +11,48 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class DiscountRequest {
-    @NotBlank(message = "Discount code is required")
+    @NotBlank(message = "Код акции обязателен")
     @Pattern(regexp = "^[A-Z0-9_-]{3,50}$",
-            message = "Discount code must contain only uppercase letters, numbers, underscore and hyphen (3-50 characters)")
+            message = "Код акции должен состоять только из Заглавных букв латинского алфавита, '-', '_' и цифр (3-50 символов)")
     private String code;
 
-    @NotBlank(message = "Discount name is required")
-    @Size(min = 3, max = 200, message = "Discount name must be between 3 and 200 characters")
+    @NotBlank(message = "Название акции обязательно")
+    @Size(min = 3, max = 200, message = "Название акции должно состоять от 3 до 200 символов")
     private String name;
 
-    @Size(max = 1000, message = "Description cannot exceed 1000 characters")
+    @Size(max = 1000, message = "Описание не может быть более 1000 символов")
     private String description;
 
-    @NotNull(message = "Discount type is required")
-    private DiscountType type;
+    @NotNull(message = "Тип акции обязателен")
+    private String type;
 
-    @NotNull(message = "Discount value is required")
-    @DecimalMin(value = "0.01", message = "Discount value must be greater than 0")
-    @DecimalMax(value = "999999.99", message = "Discount value cannot exceed 999999.99")
-    private BigDecimal value;
+    @NotNull(message = "Величина скидки по акции обязательна")
+    @DecimalMin(value = "0.00", message = "Значение не может быть меньше 0")
+    @DecimalMax(value = "999999.99", message = "Значение не может быть 999999.99 или больше")
+    private BigDecimal valueAmount;
 
-    @Positive(message = "Category ID must be positive")
+    @NotNull(message = "Величина скидки по акции обязательна")
+    @DecimalMin(value = "0.00", message = "Значение процентов не может быть меньше 0")
+    @DecimalMax(value = "99.99", message = "Значение процентов не может быть 99.99 или больше")
+    private BigDecimal valuePercentage;
+
+    @Positive(message = "ID категории должно быть положительным")
     private Long applicableCategoryId;
 
-    @NotNull(message = "Start date is required")
-    @FutureOrPresent(message = "Start date cannot be in the past")
+    @NotNull(message = "Дата начала акции обязательна")
+    @FutureOrPresent(message = "Дата начала акции не может быть оформлена задним числом")
     private LocalDateTime startDate;
 
-    @NotNull(message = "End date is required")
-    @Future(message = "End date must be in the future")
+    @NotNull(message = "Дата конца акции обязательна")
+    @Future(message = "Дата конца акции не может быть оформлена на момент начала акции")
     private LocalDateTime endDate;
 
-    @NotNull(message = "Usage limit is required")
-    @Min(value = 1, message = "Usage limit must be at least 1")
-    @Max(value = 999999, message = "Usage limit cannot exceed 999999")
+    @NotNull(message = "Максимальное количество использований должно быть объявлено")
+    @Min(value = 1, message = "Максимальное количество использований должно быть 1 или больше")
+    @Max(value = 9999999, message = "Максимальное количество использований не должно превышать 9999999 раз")
     private Integer usageLimit;
 
-    @AssertTrue(message = "End date must be after start date")
+    @AssertTrue(message = "Дата начала акции не должна быть позже даты окончания акции")
     private boolean isEndDateAfterStartDate() {
         if (startDate == null || endDate == null) {
             return true;

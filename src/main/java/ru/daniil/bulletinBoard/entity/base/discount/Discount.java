@@ -53,8 +53,8 @@ public class Discount {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private DiscountType type;
 
     public Discount() {
         applicableCategoryId = -1L;
@@ -72,6 +72,6 @@ public class Discount {
         this.startDate = startDate;
         this.endDate = endDate;
         this.usageLimit = usageLimit;
-        this.type = type.toString();
+        this.type = type;
     }
 }
