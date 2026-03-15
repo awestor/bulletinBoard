@@ -1,4 +1,4 @@
-package ru.daniil.bulletinBoard.service.user;
+package ru.daniil.bulletinBoard.service.user.auth;
 
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,0 +1,41 @@
+package ru.daniil.bulletinBoard.mapper;
+
+import org.mapstruct.*;
+import ru.daniil.bulletinBoard.entity.base.product.Category;
+import ru.daniil.bulletinBoard.entity.base.product.Product;
+import ru.daniil.bulletinBoard.entity.request.CreateProductRequest;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {CategoryMapper.class, ProductImageMapper.class, ProductAttributeMapper.class})
+public interface ProductMapper {
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "discount", ignore = true)
+    @Mapping(target = "sku", ignore = true)
+    @Mapping(target = "status", constant = "ACTIVE")
+    @Mapping(target = "images", ignore = true)
+    @Mapping(target = "attributes", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    Product toEntity(CreateProductRequest request);
+
+    @Named("getCategoryPath")
+    default String getCategoryPath(Category category) {
+        return category != null ? category.getFullPath() : null;
+    }
+
+    @Named("getMainImage")
+    default String getMainImage(List<ru.daniil.bulletinBoard.entity.base.product.ProductImage> images) {
+        if (images == null || images.isEmpty()) {
+            return null;
+        }
+        return images.stream()
+                .filter(img -> Boolean.TRUE.equals(img.getIsMain()))
+                .findFirst()
+                .map(ru.daniil.bulletinBoard.entity.base.product.ProductImage::getPath)
+                .orElse(images.getFirst().getPath());
+    }
+}

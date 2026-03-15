@@ -66,8 +66,6 @@ public class Product {
     private LocalDateTime updatedAt;
 
     public Product() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
         images = new ArrayList<>();
         attributes = new HashSet<>();
     }
@@ -79,8 +77,6 @@ public class Product {
         this.price = price;
         this.priceAtTime = price;
         this.status = ProductStatus.ACTIVE;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     public void setPrice(BigDecimal price) {
@@ -133,6 +129,12 @@ public class Product {
     public void setAttributes(Set<ProductAttribute> attributes) {
         this.attributes.clear();
         this.attributes = attributes;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate

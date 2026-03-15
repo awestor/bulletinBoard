@@ -60,8 +60,6 @@ public class Order {
         this.status = OrderStatus.DRAFT;
         this.items = new ArrayList<>();
         this.appliedDiscounts = new ArrayList<>();
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     public Order(User user) {
@@ -72,6 +70,12 @@ public class Order {
     private String generateOrderNumber() {
         return "ORD-" + System.currentTimeMillis() + "-" +
                 UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 }
 

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест аутентификации</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4285f4;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3367d6;
+        }
+        .google-btn {
+            background-color: #db4437;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .google-btn:hover {
+            background-color: #c53929;
+        }
+        .token-display {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #4285f4;
+            word-break: break-all;
+        }
+        .token-display h3 {
+            margin-top: 0;
+            color: #4285f4;
+        }
+        .token-display pre {
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .error {
+            color: #dc3545;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .success {
+            color: #28a745;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+            margin: 0;
+        }
+        .tab.active {
+            color: #4285f4;
+            border-bottom: 2px solid #4285f4;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .info-box {
+            background-color: #e8f0fe;
+            border-left: 4px solid #4285f4;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .refresh-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔐 Тест аутентификации</h1>
+
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('login')">Вход</button>
+        <button class="tab" onclick="showTab('register')">Регистрация</button>
+        <button class="tab" onclick="showTab('refresh')">Обновление токена</button>
+    </div>
+
+    <!-- Вкладка входа -->
+    <div id="login-tab" class="tab-content active">
+        <h2>Вход в систему</h2>
+
+        <div class="info-box">
+            <strong>Тестовые данные:</strong><br>
+            Логин: test@test.com<br>
+            Пароль: password123
+        </div>
+
+        <div class="form-group">
+            <label for="login-username">Логин или Email:</label>
+            <input type="text" id="login-username" placeholder="Введите логин или email">
+        </div>
+        <div class="form-group">
+            <label for="login-password">Пароль:</label>
+            <input type="password" id="login-password" placeholder="Введите пароль">
+        </div>
+        <button onclick="login()">Войти</button>
+
+        <div style="text-align: center; margin: 15px 0; color: #666;">или</div>
+
+        <button class="google-btn" onclick="googleLogin()">
+            <svg width="20" height="20" viewBox="0 0 24 24">
+                <path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Войти через Google
+        </button>
+    </div>
+
+    <!-- Вкладка регистрации -->
+    <div id="register-tab" class="tab-content">
+        <h2>Регистрация</h2>
+
+        <div class="form-group">
+            <label for="register-email">Email:</label>
+            <input type="email" id="register-email" placeholder="Введите email">
+        </div>
+        <div class="form-group">
+            <label for="register-login">Логин:</label>
+            <input type="text" id="register-login" placeholder="Введите логин">
+        </div>
+        <div class="form-group">
+            <label for="register-password">Пароль:</label>
+            <input type="password" id="register-password" placeholder="Введите пароль">
+        </div>
+        <div class="form-group">
+            <label for="register-confirm-password">Подтверждение пароля:</label>
+            <input type="password" id="register-confirm-password" placeholder="Повторите пароль">
+        </div>
+        <button onclick="register()">Зарегистрироваться</button>
+    </div>
+
+    <!-- Вкладка обновления токена -->
+    <div id="refresh-tab" class="tab-content">
+        <h2>Обновление access токена</h2>
+
+        <div class="refresh-section">
+            <div class="form-group">
+                <label for="refresh-token">Refresh Token:</label>
+                <textarea id="refresh-token" rows="3" placeholder="Вставьте refresh token"></textarea>
+            </div>
+            <button onclick="refreshAccessToken()">Обновить токен</button>
+        </div>
+    </div>
+
+    <!-- Отображение токенов -->
+    <div id="tokenDisplay" class="token-display" style="display: none;">
+        <h3>✅ Успешная аутентификация</h3>
+        <p><strong>Access Token:</strong></p>
+        <pre id="accessToken"></pre>
+        <p><strong>Refresh Token:</strong></p>
+        <pre id="refreshToken"></pre>
+        <p><strong>Expires In:</strong> <span id="expiresIn"></span> секунд</p>
+        <p><strong>Token Type:</strong> <span id="tokenType"></span></p>
+        <button onclick="copyTokens()" style="width: auto; background-color: #28a745;">Копировать токены</button>
+    </div>
+
+    <!-- Сообщения -->
+    <div id="message" class="error" style="display: none;"></div>
+</div>
+
+<script>
+    function showTab(tabName) {
+        // Скрываем все вкладки
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+
+        // Показываем выбранную вкладку
+        document.getElementById(tabName + '-tab').classList.add('active');
+        event.target.classList.add('active');
+
+        // Скрываем сообщение о токенах
+        document.getElementById('tokenDisplay').style.display = 'none';
+        document.getElementById('message').style.display = 'none';
+    }
+
+    async function login() {
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+
+        if (!username || !password) {
+            showMessage('Заполните все поля', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                displayTokens(data);
+                showMessage('Вход выполнен успешно!', 'success');
+            } else {
+                showMessage('Ошибка входа: неверные данные', 'error');
+            }
+        } catch (error) {
+            showMessage('Ошибка соединения с сервером', 'error');
+        }
+    }
+
+    async function register() {
+        const email = document.getElementById('register-email').value;
+        const login = document.getElementById('register-login').value;
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-confirm-password').value;
+
+        if (!email || !login || !password || !confirmPassword) {
+            showMessage('Заполните все поля', 'error');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showMessage('Пароли не совпадают', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, login, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                displayTokens(data);
+                showMessage('Регистрация выполнена успешно!', 'success');
+            } else {
+                const error = await response.text();
+                showMessage('Ошибка регистрации: ' + error, 'error');
+            }
+        } catch (error) {
+            showMessage('Ошибка соединения с сервером', 'error');
+        }
+    }
+
+    async function refreshAccessToken() {
+        const refreshToken = document.getElementById('refresh-token').value;
+
+        if (!refreshToken) {
+            showMessage('Введите refresh token', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/auth/refresh', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refreshToken })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                displayTokens(data);
+                showMessage('Токен успешно обновлен!', 'success');
+            } else {
+                showMessage('Ошибка обновления токена', 'error');
+            }
+        } catch (error) {
+            showMessage('Ошибка соединения с сервером', 'error');
+        }
+    }
+
+    function googleLogin() {
+        window.location.href = '/oauth2/authorization/google';
+    }
+
+    function displayTokens(data) {
+        document.getElementById('accessToken').textContent = data.accessToken;
+        document.getElementById('refreshToken').textContent = data.refreshToken;
+        document.getElementById('expiresIn').textContent = data.expiresIn;
+        document.getElementById('tokenType').textContent = data.tokenType;
+        document.getElementById('tokenDisplay').style.display = 'block';
+
+        // Автоматически заполняем поле refresh token на вкладке обновления
+        document.getElementById('refresh-token').value = data.refreshToken;
+    }
+
+    function copyTokens() {
+        const tokens =
+            'Access Token:\n' + document.getElementById('accessToken').textContent +
+            '\n\nRefresh Token:\n' + document.getElementById('refreshToken').textContent;
+
+        navigator.clipboard.writeText(tokens).then(() => {
+            showMessage('Токены скопированы!', 'success');
+        });
+    }
+
+    function showMessage(text, type) {
+        const messageEl = document.getElementById('message');
+        messageEl.textContent = text;
+        messageEl.className = type;
+        messageEl.style.display = 'block';
+
+        setTimeout(() => {
+            messageEl.style.display = 'none';
+        }, 5000);
+    }
+
+    // Проверяем URL на наличие токенов после OAuth2 редиректа
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessToken = urlParams.get('access_token');
+        const refreshToken = urlParams.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+            displayTokens({
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                expiresIn: 1200,
+                tokenType: 'Bearer'
+            });
+
+            // Очищаем URL от параметров
+            window.history.replaceState({}, document.title, '/test-auth.html');
+        }
+    };
+</script>
+</body>
+</html>

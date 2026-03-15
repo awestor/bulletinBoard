@@ -27,12 +27,16 @@ public class PaymentMethod {
     private LocalDateTime createdAt;
 
     public PaymentMethod() {
-        createdAt = LocalDateTime.now();
     }
 
     public PaymentMethod(String type, String description) {
         this();
         this.type = type;
         this.description = description;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 }

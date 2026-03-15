@@ -15,4 +15,9 @@ public class AuthViewController {
     public String registerPage() {
         return "register";
     }
+
+    @GetMapping("/test-auth")
+    public String testAuthPage() {
+        return "testAuth";
+    }
 }

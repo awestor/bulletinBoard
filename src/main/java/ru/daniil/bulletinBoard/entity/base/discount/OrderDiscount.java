@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class OrderDiscount {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,7 +39,6 @@ public class OrderDiscount {
     private LocalDateTime reservedUntil;
 
     public OrderDiscount() {
-        createdAt = LocalDateTime.now();
     }
 
     public OrderDiscount(Order order, Discount discount) {
@@ -58,5 +56,10 @@ public class OrderDiscount {
                     .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
         }
         return discount.getFixedAmount() != null ? discount.getFixedAmount() : BigDecimal.ZERO;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 }

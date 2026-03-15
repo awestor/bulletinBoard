@@ -8,11 +8,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.daniil.bulletinBoard.entity.base.user.RefreshToken;
 import ru.daniil.bulletinBoard.entity.base.user.User;
 import ru.daniil.bulletinBoard.entity.request.auth.LoginRequest;
 import ru.daniil.bulletinBoard.entity.request.auth.RegistrationRequest;
-import ru.daniil.bulletinBoard.entity.response.jwt.JwtResponse;
-import ru.daniil.bulletinBoard.service.user.JwtService;
+import ru.daniil.bulletinBoard.entity.response.auth.JwtResponse;
+import ru.daniil.bulletinBoard.entity.response.auth.RefreshTokenRequest;
+import ru.daniil.bulletinBoard.service.user.auth.JwtService;
 import ru.daniil.bulletinBoard.service.user.UserService;
 
 import java.util.Optional;
@@ -26,7 +28,8 @@ public class AuthApiController {
 
     @Autowired
     AuthApiController(UserService userService,
-                      UserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
+                      UserDetailsService userDetailsService,
+                      PasswordEncoder passwordEncoder,
                       JwtService jwtService){
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -42,8 +45,14 @@ public class AuthApiController {
                     return ResponseEntity.badRequest().build();
                 }
 
-                String jwtToken = jwtService.generateToken(user.get());
-                return ResponseEntity.ok(new JwtResponse(jwtToken));
+                String accessToken = jwtService.generateToken(user.get());
+                RefreshToken refreshToken = jwtService.generateRefreshToken(user.get());
+
+                return ResponseEntity.ok(JwtResponse.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken.getToken())
+                        .expiresIn(1200L) // 20 минут в секундах
+                        .build());
             }
 
             return ResponseEntity.badRequest().build();
@@ -53,29 +62,51 @@ public class AuthApiController {
         }
     }
 
-    /**
-     * Регистрация нового пользователя
-     * @param registrationRequest заполненная форма регистрации
-     * @param bindingResult результат валидации с фронта
-     * @return путь для перенаправления
-     */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest,
                                           BindingResult bindingResult) {
-        System.err.println("1");
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.badRequest().body("Ошибка валидации");
         }
-        System.err.println("2");
+
         try {
             UserDetails user = userService.registerUser(registrationRequest);
-            System.err.println("userService регистрации был вызван");
-            String jwtToken = jwtService.generateToken(user);
-            System.err.println("jwtService регистрации был вызван");
-            return ResponseEntity.ok(new JwtResponse(jwtToken));
+            String accessToken = jwtService.generateToken(user);
+            RefreshToken refreshToken = jwtService.generateRefreshToken((User) user);
+
+            return ResponseEntity.ok(JwtResponse.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken.getToken())
+                    .expiresIn(1200L)
+                    .build());
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ошибка при создании");
+            return ResponseEntity.badRequest().body("Ошибка при создании: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        try {
+            String newAccessToken = jwtService.refreshAccessToken(request.getRefreshToken());
+
+            return ResponseEntity.ok(JwtResponse.builder()
+                    .accessToken(newAccessToken)
+                    .refreshToken(request.getRefreshToken()) // возвращаем тот же refresh токен
+                    .expiresIn(1200L)
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody RefreshTokenRequest request) {
+        try {
+            // Здесь будет логика для удаления действия refresh токена и выхода пользователя
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

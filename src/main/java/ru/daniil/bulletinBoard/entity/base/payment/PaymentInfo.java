@@ -37,7 +37,6 @@ public class PaymentInfo {
 
     public PaymentInfo() {
         this.status = PaymentStatus.PROCESSING;
-        this.createdAt = LocalDateTime.now();
     }
 
     public PaymentInfo(String orderNumber, BigDecimal totalPrice) {
@@ -45,5 +44,10 @@ public class PaymentInfo {
         this.orderNumber = orderNumber;
         this.totalPrice = totalPrice;
         this.method = null;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 }

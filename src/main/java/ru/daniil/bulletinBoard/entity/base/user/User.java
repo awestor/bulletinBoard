@@ -56,7 +56,6 @@ public class User implements UserDetails {
     private Set<Role> roles;
 
     public User() {
-        this.createdAt = LocalDateTime.now();
         tradingBlocked = false;
         roles = new HashSet<>();
     }
@@ -66,6 +65,11 @@ public class User implements UserDetails {
         this.email = email;
         this.login = login;
         this.password = password;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 
     @SuppressWarnings("NullableProblems")

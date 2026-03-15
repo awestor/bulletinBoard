@@ -1,15 +1,16 @@
 package ru.daniil.bulletinBoard.config.postConstructInit;
 
-import jakarta.annotation.PostConstruct;
-import org.springframework.core.annotation.Order;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import ru.daniil.bulletinBoard.entity.base.user.User;
 import ru.daniil.bulletinBoard.enums.RoleName;
 import ru.daniil.bulletinBoard.repository.user.RoleRepository;
 import ru.daniil.bulletinBoard.repository.user.UserRepository;
 
-
-public class FirstUserPostConstructInitializer {
+@Component
+public class FirstUserPostConstructInitializer implements ApplicationRunner {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -23,9 +24,6 @@ public class FirstUserPostConstructInitializer {
         this.passwordEncoder = passwordEncoder;
     }
 
-
-    @PostConstruct
-    @Order(2)
     public void initializeFirstUser() {
         createMealTypeIfFirstUser();
     }
@@ -43,5 +41,10 @@ public class FirstUserPostConstructInitializer {
             userRepository.save(user);
             System.out.println("Создан первый пользователь с ролями USER и ADMIN");
         }
+    }
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        //initializeFirstUser();
     }
 }

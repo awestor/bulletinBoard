@@ -49,8 +49,6 @@ public class Category {
     private LocalDateTime updatedAt;
 
     public Category() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
         children = new ArrayList<>();
         products = new ArrayList<>();
     }
@@ -59,13 +57,17 @@ public class Category {
         this();
         this.name = name;
         this.type = type;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     public Category(String name, CategoryType type, Category parent) {
         this(name, type);
         this.parent = parent;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     public boolean isLeaf() {
