@@ -39,6 +39,16 @@
             font-size: 16px;
             box-sizing: border-box;
         }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+            font-family: monospace;
+            resize: vertical;
+        }
         button {
             background-color: #4285f4;
             color: white;
@@ -64,6 +74,16 @@
         .google-btn:hover {
             background-color: #c53929;
         }
+        .keycloak-btn {
+            background-color: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .keycloak-btn:hover {
+            background-color: #45a049;
+        }
         .token-display {
             margin-top: 20px;
             padding: 15px;
@@ -82,6 +102,8 @@
             border-radius: 5px;
             overflow-x: auto;
             font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
         }
         .error {
             color: #dc3545;
@@ -134,6 +156,37 @@
             background-color: #f0f7ff;
             border-radius: 5px;
         }
+        .token-payload {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+        .token-payload h4 {
+            margin: 0 0 10px 0;
+            color: #0d47a1;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .button-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -164,11 +217,11 @@
             <label for="login-password">Пароль:</label>
             <input type="password" id="login-password" placeholder="Введите пароль">
         </div>
-        <button onclick="login()">Войти</button>
+        <button onclick="login()" id="loginBtn">Войти</button>
 
         <div style="text-align: center; margin: 15px 0; color: #666;">или</div>
 
-        <button class="google-btn" onclick="googleLogin()">
+        <button class="google-btn" onclick="googleLogin()" id="googleLoginBtn">
             <svg width="20" height="20" viewBox="0 0 24 24">
                 <path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -176,6 +229,13 @@
                 <path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
             Войти через Google
+        </button>
+
+        <button class="keycloak-btn" onclick="keycloakLogin()" id="keycloakLoginBtn" style="margin-top: 10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+            </svg>
+            Войти через Keycloak
         </button>
     </div>
 
@@ -199,7 +259,7 @@
             <label for="register-confirm-password">Подтверждение пароля:</label>
             <input type="password" id="register-confirm-password" placeholder="Повторите пароль">
         </div>
-        <button onclick="register()">Зарегистрироваться</button>
+        <button onclick="register()" id="registerBtn">Зарегистрироваться</button>
     </div>
 
     <!-- Вкладка обновления токена -->
@@ -211,7 +271,7 @@
                 <label for="refresh-token">Refresh Token:</label>
                 <textarea id="refresh-token" rows="3" placeholder="Вставьте refresh token"></textarea>
             </div>
-            <button onclick="refreshAccessToken()">Обновить токен</button>
+            <button onclick="refreshAccessToken()" id="refreshBtn">Обновить токен</button>
         </div>
     </div>
 
@@ -224,7 +284,19 @@
         <pre id="refreshToken"></pre>
         <p><strong>Expires In:</strong> <span id="expiresIn"></span> секунд</p>
         <p><strong>Token Type:</strong> <span id="tokenType"></span></p>
-        <button onclick="copyTokens()" style="width: auto; background-color: #28a745;">Копировать токены</button>
+
+        <!-- Декодированный payload токена -->
+        <div id="tokenPayload" class="token-payload" style="display: none;">
+            <h4>📦 Декодированный токен (payload):</h4>
+            <pre id="decodedToken"></pre>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button onclick="copyTokens()" style="width: auto; background-color: #28a745; flex: 1;">Копировать токены</button>
+            <button onclick="registerWithToken()" style="width: auto; background-color: #db4437; flex: 1;" id="registerWithTokenBtn">
+                Зарегистрироваться с токеном
+            </button>
+        </div>
     </div>
 
     <!-- Сообщения -->
@@ -232,6 +304,12 @@
 </div>
 
 <script>
+    // Функция для получения query-параметров из URL
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
     function showTab(tabName) {
         // Скрываем все вкладки
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -255,6 +333,8 @@
             return;
         }
 
+        setButtonLoading('loginBtn', true);
+
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -273,6 +353,8 @@
             }
         } catch (error) {
             showMessage('Ошибка соединения с сервером', 'error');
+        } finally {
+            setButtonLoading('loginBtn', false);
         }
     }
 
@@ -291,6 +373,8 @@
             showMessage('Пароли не совпадают', 'error');
             return;
         }
+
+        setButtonLoading('registerBtn', true);
 
         try {
             const response = await fetch('/api/auth/register', {
@@ -311,6 +395,8 @@
             }
         } catch (error) {
             showMessage('Ошибка соединения с сервером', 'error');
+        } finally {
+            setButtonLoading('registerBtn', false);
         }
     }
 
@@ -321,6 +407,8 @@
             showMessage('Введите refresh token', 'error');
             return;
         }
+
+        setButtonLoading('refreshBtn', true);
 
         try {
             const response = await fetch('/api/auth/refresh', {
@@ -340,11 +428,128 @@
             }
         } catch (error) {
             showMessage('Ошибка соединения с сервером', 'error');
+        } finally {
+            setButtonLoading('refreshBtn', false);
+        }
+    }
+
+    // Функция для регистрации по токену
+    async function registerWithToken() {
+        const accessToken = document.getElementById('accessToken').textContent;
+        const refreshToken = document.getElementById('refreshToken').textContent;
+        const expiresIn = document.getElementById('expiresIn').textContent;
+        const tokenType = document.getElementById('tokenType').textContent;
+
+        if (!accessToken) {
+            showMessage('Нет access токена для регистрации', 'error');
+            return;
+        }
+
+        setButtonLoading('registerWithTokenBtn', true);
+
+        try {
+            // Декодируем токен, чтобы получить данные пользователя
+            const tokenData = parseJwt(accessToken);
+
+            // Определяем провайдера на основе данных токена
+            const authProvider = determineAuthProvider(tokenData);
+
+            // Создаем RegistrationRequest
+            const registrationData = {
+                login: tokenData.preferred_username || tokenData.email || 'user_' + Date.now(),
+                email: tokenData.email || '',
+                password: null, // Пароль null для OAuth2 регистрации
+                authProvider: authProvider // Определенный провайдер
+            };
+
+            // Создаем JwtResponse
+            const jwtResponse = {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                expiresIn: parseInt(expiresIn),
+                tokenType: tokenType
+            };
+
+            console.log('Отправка данных на регистрацию:', {
+                jwtResponse: jwtResponse,
+                authProvider: registrationData.authProvider
+            });
+
+            const response = await fetch('/api/auth/registerByToken?authProvider=' + authProvider, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jwtResponse)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                showMessage('Регистрация по токену выполнена успешно!', 'success');
+
+                // Обновляем отображение токенов, если сервер вернул новые
+                if (result) {
+                    displayTokens(result);
+                }
+            } else {
+                const errorText = await response.text();
+                let errorMessage = 'Ошибка регистрации по токену';
+
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.message || errorMessage;
+                } catch {
+                    errorMessage = errorText || errorMessage;
+                }
+
+                showMessage(errorMessage, 'error');
+                console.error('Ошибка сервера:', errorText);
+            }
+        } catch (error) {
+            showMessage('Ошибка при регистрации по токену: ' + error.message, 'error');
+            console.error('Детали ошибки:', error);
+        } finally {
+            setButtonLoading('registerWithTokenBtn', false);
+        }
+    }
+
+    // Функция для определения провайдера на основе данных токена
+    function determineAuthProvider(tokenData) {
+        if (tokenData.iss) {
+            if (tokenData.iss.includes('google')) {
+                return 'google';
+            } else if (tokenData.iss.includes('keycloak') || tokenData.iss.includes('localhost:9090')) {
+                return 'keycloak';
+            } else if (tokenData.iss.includes('github')) {
+                return 'github';
+            }
+        }
+
+        // По умолчанию
+        return 'oauth2';
+    }
+
+    // Функция для декодирования JWT токена
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            console.error('Ошибка декодирования токена:', e);
+            return {};
         }
     }
 
     function googleLogin() {
-        window.location.href = '/oauth2/authorization/google';
+        window.location.href = 'http://localhost:9090/realms/bulletin-board/protocol/openid-connect/auth?client_id=bulletin-board-client&response_type=code&redirect_uri=http://localhost:8080/test-auth&state=GOOGLE&kc_idp_hint=google';
+    }
+
+    function keycloakLogin() {
+        window.location.href = 'http://localhost:9090/realms/bulletin-board/protocol/openid-connect/auth?client_id=bulletin-board-client&response_type=code&redirect_uri=' + window.location.origin + '/test-auth';
     }
 
     function displayTokens(data) {
@@ -356,6 +561,19 @@
 
         // Автоматически заполняем поле refresh token на вкладке обновления
         document.getElementById('refresh-token').value = data.refreshToken;
+
+        // Пытаемся декодировать и отобразить payload токена
+        try {
+            const decoded = parseJwt(data.accessToken);
+            document.getElementById('decodedToken').textContent = JSON.stringify(decoded, null, 2);
+            document.getElementById('tokenPayload').style.display = 'block';
+
+            // Автоматически показываем кнопку регистрации с токеном
+            document.getElementById('registerWithTokenBtn').style.display = 'block';
+        } catch (e) {
+            console.log('Не удалось декодировать токен');
+            document.getElementById('tokenPayload').style.display = 'none';
+        }
     }
 
     function copyTokens() {
@@ -379,22 +597,95 @@
         }, 5000);
     }
 
-    // Проверяем URL на наличие токенов после OAuth2 редиректа
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const accessToken = urlParams.get('access_token');
-        const refreshToken = urlParams.get('refresh_token');
+    function setButtonLoading(buttonId, isLoading) {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
 
-        if (accessToken && refreshToken) {
-            displayTokens({
-                accessToken: accessToken,
-                refreshToken: refreshToken,
-                expiresIn: 1200,
-                tokenType: 'Bearer'
-            });
+        if (isLoading) {
+            button.disabled = true;
+            button.innerHTML = '<span class="button-loading"><span class="loading"></span>Загрузка...</span>';
+        } else {
+            button.disabled = false;
+            // Восстанавливаем исходный текст кнопки
+            if (buttonId === 'loginBtn') button.innerHTML = 'Войти';
+            else if (buttonId === 'registerBtn') button.innerHTML = 'Зарегистрироваться';
+            else if (buttonId === 'refreshBtn') button.innerHTML = 'Обновить токен';
+            else if (buttonId === 'registerWithTokenBtn') button.innerHTML = 'Зарегистрироваться с токеном';
+            else if (buttonId === 'googleLoginBtn') {
+                button.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Войти через Google';
+            } else if (buttonId === 'keycloakLoginBtn') {
+                button.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg> Войти через Keycloak';
+            }
+        }
+    }
 
-            // Очищаем URL от параметров
-            window.history.replaceState({}, document.title, '/test-auth.html');
+    // Основная логика обработки кода авторизации
+    window.onload = async function() {
+        const code = getQueryParam("code");
+
+        if (code) {
+            console.log("Получен код авторизации:", code);
+
+            try {
+                setButtonLoading('keycloakLoginBtn', true);
+                const provider = getQueryParam("state");
+                console.log("Получен провайдер:", provider);
+
+                // Отправляем код на серверный эндпоинт
+                const response = await fetch("/api/auth/token", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ code, provider })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Ошибка при обмене кода на токен: ${response.status} ${errorText}`);
+                }
+
+                const data = await response.json();
+                console.log("Полученные токены от сервера:", data);
+
+                // Отображаем полученные токены
+                displayTokens(data);
+                showMessage('Авторизация через Keycloak выполнена успешно!', 'success');
+
+                // Автоматически предлагаем зарегистрироваться с токеном
+                setTimeout(() => {
+                    if (confirm('Хотите зарегистрироваться в системе с полученным токеном?')) {
+                        registerWithToken();
+                    }
+                }, 1000);
+
+            } catch (err) {
+                console.error("Ошибка при обработке кода авторизации:", err);
+                showMessage('Ошибка при авторизации через Keycloak: ' + err.message, 'error');
+            } finally {
+                setButtonLoading('keycloakLoginBtn', false);
+
+                // Очищаем URL от параметров
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        } else {
+            console.log("Код авторизации отсутствует в URL");
+
+            // Также проверяем наличие токенов в URL (для обратной совместимости)
+            const accessToken = getQueryParam('access_token');
+            const refreshToken = getQueryParam('refresh_token');
+
+            if (accessToken && refreshToken) {
+                displayTokens({
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
+                    expiresIn: 1200,
+                    tokenType: 'Bearer'
+                });
+
+                // Очищаем URL от параметров
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         }
     };
 </script>

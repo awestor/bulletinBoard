@@ -24,6 +24,15 @@ public interface UserService {
     UserDetails registerUser(RegistrationRequest request);
 
     /**
+     * Регистрирует нового пользователя в системе и назначает ему права роли "USER"
+     * Но не валидирует данные реквеста
+     * Нужен для сохранения новых пользователей, что зарегистрировались через внешнего провайдера
+     *
+     * @param request RegistrationRequest что содержит регистрационные данные
+     */
+    UserDetails registerUserWithoutValidation(RegistrationRequest request);
+
+    /**
      * Получает пользователя из если он авторизован
      * @return объект сущности пользователя или ошибка
      */
@@ -34,5 +43,12 @@ public interface UserService {
      * @param email электронная почта пользователя
      * @return true - пользователя найден, иначе false
      */
-    boolean existsUserByEmail(String email);
+    boolean existsByEmail(String email);
+
+    /**
+     * Проверяет существование пользователя по login
+     * @param login
+     * @return true - пользователя найден, иначе false
+     */
+    boolean existsByLogin(String login);
 }

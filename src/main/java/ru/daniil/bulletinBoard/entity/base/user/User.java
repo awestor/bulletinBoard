@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.daniil.bulletinBoard.enums.AuthProvider;
 import ru.daniil.bulletinBoard.enums.RoleName;
 
 import java.time.LocalDate;
@@ -31,6 +32,9 @@ public class User implements UserDetails {
 
     @Column(unique = true, nullable = false)
     private String email;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
 
     @Column(nullable = false)
     private String password;
@@ -60,11 +64,12 @@ public class User implements UserDetails {
         roles = new HashSet<>();
     }
 
-    public User(String email, String login, String password) {
+    public User(String email, String login, String password, AuthProvider authProvider) {
         this();
         this.email = email;
         this.login = login;
         this.password = password;
+        this.authProvider = authProvider;
     }
 
     @PrePersist
@@ -92,18 +97,8 @@ public class User implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
     public boolean isAccountNonLocked() {
         return blockedUntil == null || blockedUntil.isBefore(LocalDate.now());
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
     }
 
     @Override

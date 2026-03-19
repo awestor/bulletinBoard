@@ -18,6 +18,7 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    @Override
     @Transactional
     public Category create(CreateCategoryRequest request) {
         Category category;
@@ -35,6 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.save(category);
     }
 
+    @Override
     @Transactional
     public Category update(String categoryOldName, CreateCategoryRequest request) {
         Category category = getByName(categoryOldName);
@@ -59,29 +61,35 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.save(category);
     }
 
+    @Override
     public Category getById(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Категория с указанным id не найдена"));
     }
 
+    @Override
     public Category getByName(String categoryName) {
         return categoryRepository.findByName(categoryName)
                 .orElseThrow(() -> new RuntimeException("Категория с указанным именем не найдена"));
     }
 
+    @Override
     public List<Category> getRootCategories() {
         return categoryRepository.findByParentIsNull();
     }
 
+    @Override
     public List<Category> getNextCategories(String categoryName) {
         Category category = getByName(categoryName);
         return categoryRepository.findByParentId(category.getId());
     }
 
+    @Override
     public List<Category> getLeafCategories() {
         return categoryRepository.findByType(CategoryType.LEAF.toString());
     }
 
+    @Override
     @Transactional
     public void delete(String categoryName) {
         Category category = getByName(categoryName);
@@ -89,6 +97,12 @@ public class CategoryServiceImpl implements CategoryService {
         validateCategoryForDeletion(category);
 
         categoryRepository.delete(category);
+    }
+
+    @Override
+    public void updateParentForCategories (Category oldCategory, Category newCategory){
+        List<Category> children = getNextCategories(oldCategory.getName());
+        categoryRepository.updateParentForCategories(children, newCategory);
     }
 
     private void validateCategoryForDeletion(Category category) {
@@ -103,10 +117,5 @@ public class CategoryServiceImpl implements CategoryService {
                     String.format("Удаление категории '%s' невозможно: к категории присвоены продукты", category.getName())
             );
         }
-    }
-
-    public void updateParentForCategories (Category oldCategory, Category newCategory){
-        List<Category> children = getNextCategories(oldCategory.getName());
-        categoryRepository.updateParentForCategories(children, newCategory);
     }
 }

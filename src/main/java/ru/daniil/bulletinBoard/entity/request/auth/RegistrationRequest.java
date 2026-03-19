@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
+import ru.daniil.bulletinBoard.enums.AuthProvider;
 
 @Data
 @Builder
@@ -26,11 +27,22 @@ public class RegistrationRequest {
             message = "Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы латинского алфавита, цифры и специальные символы (кроме @/|\\*#&?)")
     private String password;
 
-    public RegistrationRequest() {}
+    private AuthProvider authProvider;
+
+    public RegistrationRequest() {
+        authProvider = null;
+    }
 
     public RegistrationRequest(String login, String email, String password) {
         this.login = login;
         this.email = email;
         this.password = password;
+    }
+
+    public RegistrationRequest(String login, String email, String password, AuthProvider authProvider) {
+        this.login = login;
+        this.email = email;
+        this.password = password;
+        this.authProvider = authProvider;
     }
 }

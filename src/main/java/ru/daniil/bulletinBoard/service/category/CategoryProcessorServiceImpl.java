@@ -15,6 +15,7 @@ public class CategoryProcessorServiceImpl implements CategoryProcessorService {
         this.productService = productService;
     }
 
+    @Override
     @Transactional
     public void deleteWithReplace(String categoryName, String newCategoryName) {
         if (newCategoryName == null) {

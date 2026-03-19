@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.daniil.bulletinBoard.entity.base.user.User;
 import ru.daniil.bulletinBoard.entity.request.auth.RegistrationRequest;
+import ru.daniil.bulletinBoard.enums.AuthProvider;
 import ru.daniil.bulletinBoard.repository.user.UserRepository;
 import ru.daniil.bulletinBoard.service.user.UserServiceImpl;
 
@@ -45,8 +46,9 @@ class UserServiceImplTest {
         validRequest.setEmail("test@test.com");
         validRequest.setLogin("testuser");
         validRequest.setPassword("Test123!$%");
+        validRequest.setAuthProvider(AuthProvider.LOCAL);
 
-        user = new User("test@test.com", "testuser", "encodedPassword");
+        user = new User("test@test.com", "testuser", "encodedPassword", AuthProvider.LOCAL);
         user.setId(1L);
     }
 
@@ -211,7 +213,7 @@ class UserServiceImplTest {
     void existsUserByEmail_WhenExists_ShouldReturnTrue() {
         when(userRepository.existsByEmail("test@test.com")).thenReturn(true);
 
-        boolean result = userService.existsUserByEmail("test@test.com");
+        boolean result = userService.existsByEmail("test@test.com");
 
         assertTrue(result);
     }
@@ -220,7 +222,7 @@ class UserServiceImplTest {
     void existsUserByEmail_WhenNotExists_ShouldReturnFalse() {
         when(userRepository.existsByEmail("test@test.com")).thenReturn(false);
 
-        boolean result = userService.existsUserByEmail("test@test.com");
+        boolean result = userService.existsByEmail("test@test.com");
 
         assertFalse(result);
     }

@@ -12,15 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JwtResponse {
     private String accessToken;
-    private String refreshToken;
     private String type;
     private Long expiresIn;
 
-    public JwtResponse(String accessToken, String refreshToken, Long expiresIn) {
-        type = "Bearer";
+    public JwtResponse(String accessToken, Long expiresIn, String tokenType) {
         this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
         this.expiresIn = expiresIn;
+        this.type = tokenType;
     }
 
     @PrePersist

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.daniil.bulletinBoard.entity.base.user.User;
 import ru.daniil.bulletinBoard.entity.request.auth.RegistrationRequest;
+import ru.daniil.bulletinBoard.enums.AuthProvider;
 import ru.daniil.bulletinBoard.repository.user.UserRepository;
 
 import java.util.Optional;
@@ -39,7 +40,20 @@ public class UserServiceImpl implements UserService {
         User user = new User(
                 request.getEmail(),
                 request.getLogin(),
-                passwordEncoder.encode(request.getPassword())
+                passwordEncoder.encode(request.getPassword()),
+                AuthProvider.LOCAL
+        );
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public UserDetails registerUserWithoutValidation(RegistrationRequest request) {
+        User user = new User(
+                request.getEmail(),
+                request.getLogin(),
+                "-",
+                request.getAuthProvider()
         );
 
         return userRepository.save(user);
@@ -73,8 +87,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean existsUserByEmail(String email) {
+    public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByLogin(String login) {
+        return userRepository.existsByLogin(login);
     }
 
     @Override

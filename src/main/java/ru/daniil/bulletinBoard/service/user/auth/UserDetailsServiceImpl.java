@@ -1,5 +1,7 @@
 package ru.daniil.bulletinBoard.service.user.auth;
 
+import exceptions.UserBlockedExeption;
+import exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,14 +27,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         if (username.contains("@")) {
             user = userRepository.findByEmail(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + username));
+                    .orElseThrow(() -> new UserNotFoundException("Пользователь не найден: " + username));
         } else {
             user = userRepository.findByLogin(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + username));
+                    .orElseThrow(() -> new UserNotFoundException("Пользователь не найден: " + username));
         }
 
         if (!user.isAccountNonLocked()) {
-            throw new UsernameNotFoundException("Аккаунт заблокирован до: " + user.getBlockedUntil());
+            throw new UserBlockedExeption("Аккаунт заблокирован до: " + user.getBlockedUntil());
         }
 
         return user;
