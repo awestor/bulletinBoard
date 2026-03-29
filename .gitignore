@@ -40,3 +40,4 @@ uploads/
 
 ### Other ###
 .env
+/logs/

@@ -29,6 +29,7 @@ public class Category {
     private String description;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private CategoryType type;
 
     @ManyToOne(fetch = FetchType.LAZY)

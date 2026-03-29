@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.daniil.bulletinBoard.entity.base.product.Category;
+import ru.daniil.bulletinBoard.enums.CategoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +17,9 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     List<Category> findByParentId(Long parentId);
 
-    List<Category> findByType(String type);
+    List<Category> findByType(CategoryType type);
 
-    Optional<Category> findByName(String type);
+    Optional<Category> findByName(String name);
 
     @Modifying
     @Query("UPDATE Category c SET c.parent = :newParent WHERE c IN :children")

@@ -1,5 +1,9 @@
 package ru.daniil.bulletinBoard.service.category;
 
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.daniil.bulletinBoard.entity.base.product.Category;
@@ -14,8 +18,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    private final CacheManager cacheManager;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CacheManager cacheManager) {
         this.categoryRepository = categoryRepository;
+        this.cacheManager = cacheManager;
     }
 
     @Override
@@ -74,6 +81,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Cacheable(
+            value = "rootCat",
+            key = "'rootCategories'",
+            unless = "#result == null || #result.isEmpty()"
+    )
     public List<Category> getRootCategories() {
         return categoryRepository.findByParentIsNull();
     }
@@ -85,12 +97,21 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Cacheable(
+            value = "leafCat",
+            key = "'leafCategories'",
+            unless = "#result == null || #result.isEmpty()"
+    )
     public List<Category> getLeafCategories() {
-        return categoryRepository.findByType(CategoryType.LEAF.toString());
+        return categoryRepository.findByType(CategoryType.LEAF);
     }
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "leafCat", key = "leafCategories"),
+            @CacheEvict(value = "rootCat", key = "rootCategories")
+    })
     public void delete(String categoryName) {
         Category category = getByName(categoryName);
 
