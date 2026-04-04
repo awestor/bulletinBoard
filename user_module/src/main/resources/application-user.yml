@@ -1,0 +1,78 @@
+keycloak:
+  auth-server-url: http://localhost:9090
+  realm: bulletin-board
+  resource: bulletin-board-client
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET:keycloak-client-secret}
+  admin:
+    client-id: admin-cli
+    username: ${KEYCLOAK_ADMIN_NAME:admin}
+    password: ${KEYCLOAK_ADMIN_PASS:admin}
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: bulletin-board-client
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            scope: openid,profile,email
+            #redirect-uri: "http://localhost:8080/test-auth"
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+        provider:
+          keycloak:
+            issuer-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}
+            authorization-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/auth
+            token-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/token
+            user-info-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/userinfo
+            jwk-set-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/certs
+            user-name-attribute: preferred_username
+
+      resourceserver:
+        jwt:
+          issuer-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}
+
+# JWT Converter
+jwt:
+  auth:
+    converter:
+      principle-attribute: preferred_username
+      resource-id: bulletin-board-client
+
+# Cookie settings
+server:
+  servlet:
+    context-path: /
+    session:
+      cookie:
+        http-only: true
+        secure: false
+        same-site: lax
+
+# Swagger JWT configuration
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: swagger
+      use-pkce: false
+    authorization-header-name: Authorization
+
+user:
+  service:
+    default-role: USER
+    max-users-per-ip: 5
+    avatar:
+      max-size: 2MB
+      allowed-formats: jpg,png,webp
+
+# Путь для загрузки файлов
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:uploads/users/}
+
+logging:
+  level:
+    ru.daniil.bulletinBoard.user: DEBUG
+    com.example.user.impl.service.UserServiceImpl: DEBUG
+    ru.daniil.bulletinBoard.config.SpringSecurityConfig: DEBUG

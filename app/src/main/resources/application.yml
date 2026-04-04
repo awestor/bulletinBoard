@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: bulletinBoard
+
+  profiles:
+    include:
+      - core
+      - security
+      - cache
+      - user
+      - order
+    active: dev
+
+  config:
+    import:
+      - classpath:application-core.yml
+      - classpath:application-cache.yml
+      - classpath:application-user.yml
+
+server:
+  port: 8080
+
+# Глобальные настройки
+spring.servlet.multipart:
+  max-file-size: 10MB
+  max-request-size: 10MB
+
+# CORS
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:8080
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+
+# Логирование
+logging:
+  config: classpath:logback-spring.xml
+  level:
+    ru.daniil.bulletinBoard: DEBUG
+    org.springframework: WARN
+    org.springframework.security: WARN
+    org.hibernate: WARN
+    org.hibernate.SQL: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.boot.web.servlet: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE

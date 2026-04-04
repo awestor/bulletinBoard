@@ -1,0 +1,28 @@
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  cache:
+    type: none # redis или caffeine
+    redis:
+      time-to-live: 600000  # 10 минут
+      cache-null-values: false
+
+# Caffeine
+caffeine:
+  cache:
+    specs:
+      users: maximumSize=100,expireAfterWrite=10m
+      orders: maximumSize=50,expireAfterWrite=5m
+
+logging:
+  level:
+    org.springframework.data.redis.cache: DEBUG
