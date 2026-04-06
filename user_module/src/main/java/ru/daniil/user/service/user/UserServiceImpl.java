@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.request.auth.RegistrationRequest;
 import ru.daniil.core.enums.AuthProvider;
-import ru.daniil.user.repository.user.UserRepository;
+import ru.daniil.user.repository.UserRepository;
 
 import java.util.Optional;
 import java.util.regex.Pattern;

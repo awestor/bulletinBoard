@@ -7,12 +7,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import ru.daniil.cache.CacheModuleConfig;
+import ru.daniil.order.config.OrderModuleConfig;
+import ru.daniil.product.config.ProductModuleConfig;
 import ru.daniil.user.config.UserModuleConfig;
 
 @SpringBootApplication
 @EnableScheduling
 @EnableCaching
 @Import({
+		OrderModuleConfig.class,
+		ProductModuleConfig.class,
 		UserModuleConfig.class,
 		CacheModuleConfig.class
 })

@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import ru.daniil.core.entity.base.user.Role;
 import ru.daniil.core.enums.RoleName;
-import ru.daniil.user.repository.user.RoleRepository;
+import ru.daniil.user.repository.RoleRepository;
 
 @Component
 public class RolePostConstructInitializer {

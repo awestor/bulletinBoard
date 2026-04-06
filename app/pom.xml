@@ -19,7 +19,7 @@
     </properties>
 
     <dependencies>
-        <!-- Все impl модули -->
+        <!-- Все модули -->
         <dependency>
             <groupId>ru.daniil</groupId>
             <artifactId>user_module</artifactId>
@@ -28,6 +28,16 @@
         <dependency>
             <groupId>ru.daniil</groupId>
             <artifactId>cache_module</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.daniil</groupId>
+            <artifactId>product_module</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.daniil</groupId>
+            <artifactId>order_module</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.Role;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.RoleName;
-import ru.daniil.user.repository.user.RoleRepository;
-import ru.daniil.user.repository.user.UserRepository;
+import ru.daniil.user.repository.RoleRepository;
+import ru.daniil.user.repository.UserRepository;
 
 import java.time.LocalDate;
 

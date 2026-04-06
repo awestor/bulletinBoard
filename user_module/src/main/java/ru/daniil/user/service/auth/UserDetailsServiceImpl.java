@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.exceptions.UserBlockedExeption;
 import ru.daniil.core.exceptions.UserNotFoundException;
-import ru.daniil.user.repository.user.UserRepository;
+import ru.daniil.user.repository.UserRepository;
 
 
 @Service
