@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.daniil.core.entity.base.user.Role;
 import ru.daniil.core.entity.base.user.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Ответ с информацией о пользователе
@@ -23,7 +21,6 @@ public class UserInfoResponse {
     private Long id;
     private String login;
     private String email;
-    private Set<String> roles;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
@@ -41,9 +38,6 @@ public class UserInfoResponse {
         response.setId(user.getId());
         response.setLogin(user.getLogin());
         response.setEmail(user.getEmail());
-        response.setRoles(user.getRoles().stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet()));
         response.setCreatedAt(user.getCreatedAt());
         response.setTradingBlocked(user.isTradingBlocked());
         response.setBlockedUntil(user.getBlockedUntil());
@@ -57,7 +51,6 @@ public class UserInfoResponse {
         this.id = id;
         this.login = login;
         this.email = email;
-        this.roles = roles;
         this.createdAt = LocalDateTime.now();
     }
 }

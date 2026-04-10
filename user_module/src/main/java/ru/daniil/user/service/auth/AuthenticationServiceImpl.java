@@ -8,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.AuthProvider;
@@ -32,18 +31,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final KeycloakService keycloakService;
     private final UserDetailsServiceImpl userDetailsService;
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
     private final AuthCookieService authCookieService;
 
     public AuthenticationServiceImpl(
             AuthenticationConfiguration authenticationConfiguration,
             KeycloakService keycloakService,
-            UserDetailsServiceImpl userDetailsService, UserService userService, PasswordEncoder passwordEncoder, AuthCookieService authCookieService) {
+            UserDetailsServiceImpl userDetailsService, UserService userService, AuthCookieService authCookieService) {
         this.authenticationManager = authenticationConfiguration.getAuthenticationManager();
         this.keycloakService = keycloakService;
         this.userDetailsService = userDetailsService;
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
         this.authCookieService = authCookieService;
     }
 

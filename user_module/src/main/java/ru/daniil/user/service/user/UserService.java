@@ -49,7 +49,7 @@ public interface UserService {
 
     /**
      * Проверяет существование пользователя по login
-     * @param login
+     * @param login - имя пользователя
      * @return true - пользователя найден, иначе false
      */
     boolean existsByLogin(String login);

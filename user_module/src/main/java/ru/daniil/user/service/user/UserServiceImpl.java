@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +16,6 @@ import ru.daniil.core.enums.AuthProvider;
 import ru.daniil.image.service.user.UserImageService;
 import ru.daniil.user.repository.UserRepository;
 
-import java.io.FileNotFoundException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -63,7 +61,7 @@ public class UserServiceImpl implements UserService {
                 request.getAuthProvider()
         );
 
-        return (UserDetails)  userRepository.save(user);
+        return (UserDetails) userRepository.save(user);
     }
 
     private void validateUserData(String email, String password, String login) {

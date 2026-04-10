@@ -2,48 +2,22 @@ package ru.daniil.user.service.user;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import ru.daniil.core.entity.base.user.Role;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.enums.RoleName;
-import ru.daniil.user.repository.RoleRepository;
 import ru.daniil.user.repository.UserRepository;
 
 import java.time.LocalDate;
 
 @Transactional
 @Service
-public class UserAdminServiceImpl {
+public class UserAdminServiceImpl implements UserAdminService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
-    public UserAdminServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserAdminServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
     }
 
-    public User addRole(Long userId, RoleName roleName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Роль " + roleName + " не найдена"));
-
-        user.addRole(role);
-        return userRepository.save(user);
-    }
-
-    public User removeRole(Long userId, RoleName roleName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Роль " + roleName + " не найдена"));
-
-        user.removeRole(role);
-        return userRepository.save(user);
-    }
-
+    @Override
     public User blockUser(Long userId, LocalDate blockedUntil) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
@@ -52,6 +26,7 @@ public class UserAdminServiceImpl {
         return userRepository.save(user);
     }
 
+    @Override
     public User unblockUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
@@ -60,6 +35,7 @@ public class UserAdminServiceImpl {
         return userRepository.save(user);
     }
 
+    @Override
     public User blockTrading(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
@@ -68,6 +44,7 @@ public class UserAdminServiceImpl {
         return userRepository.save(user);
     }
 
+    @Override
     public User unblockTrading(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));

@@ -13,6 +13,5 @@ public interface AuthMapper {
     @Mapping(target = "imageName", ignore = true)
     @Mapping(target = "blockedUntil", ignore = true)
     @Mapping(target = "tradingBlocked", constant = "false")
-    @Mapping(target = "roles", ignore = true)
     User registrationRequestToUser(RegistrationRequest request);
 }

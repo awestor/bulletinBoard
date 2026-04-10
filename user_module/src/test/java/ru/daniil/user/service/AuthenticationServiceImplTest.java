@@ -77,7 +77,6 @@ class AuthenticationServiceImplTest {
                 keycloakService,
                 userDetailsService,
                 userService,
-                passwordEncoder,
                 authCookieService
         );
 

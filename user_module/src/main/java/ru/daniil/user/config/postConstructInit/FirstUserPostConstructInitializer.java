@@ -5,23 +5,18 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.enums.RoleName;
-import ru.daniil.user.repository.RoleRepository;
 import ru.daniil.user.repository.UserRepository;
 
 
 @Component
 public class FirstUserPostConstructInitializer {
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     public FirstUserPostConstructInitializer(
             UserRepository userRepository,
-            RoleRepository roleRepository,
             PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -38,11 +33,8 @@ public class FirstUserPostConstructInitializer {
             user.setLogin("firstUser");
             user.setPassword(passwordEncoder.encode("Password123!"));
 
-            roleRepository.findByName(RoleName.USER).ifPresent(user::addRole);
-            roleRepository.findByName(RoleName.ADMIN).ifPresent(user::addRole);
-
             userRepository.save(user);
-            System.out.println("Создан первый пользователь с ролями USER и ADMIN");
+            System.out.println("Создан первый пользователь");
         }
     }
 
