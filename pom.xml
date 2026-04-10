@@ -24,11 +24,12 @@
 	<modules>
 		<module>core</module>
 		<module>cache_module</module>
+		<module>image_module</module>
 		<module>user_module</module>
         <module>product_module</module>
 		<module>order_module</module>
 		<module>app</module>
-	</modules>
+    </modules>
 
 	<properties>
 		<java.version>21</java.version>
@@ -61,6 +62,16 @@
 			<dependency>
 				<groupId>ru.daniil</groupId>
 				<artifactId>user_module</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ru.daniil</groupId>
+				<artifactId>product_module</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ru.daniil</groupId>
+				<artifactId>order_module</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

@@ -20,16 +20,16 @@ public class ProductImage {
     private Product product;
 
     @Column(nullable = false)
-    private String path;
+    private String name;
 
     @Column
     private Boolean isMain;
 
     public ProductImage() {}
 
-    public ProductImage(Product product, String path, boolean isMain) {
+    public ProductImage(Product product, String name, boolean isMain) {
         this.product = product;
-        this.path = path;
+        this.name = name;
         this.isMain = isMain;
     }
 }

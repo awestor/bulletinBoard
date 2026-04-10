@@ -1,4 +1,4 @@
-package ru.daniil.user.controller;
+package ru.daniil.product.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -10,6 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.daniil.user.config.keycloak.JwtConverter;
 
@@ -31,6 +32,7 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/api/category/**",
                                 "/login",
                                 "/register",
                                 "/error",
@@ -40,13 +42,15 @@ public class SpringSecurityConfig {
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/test-auth"
+                                "/test-auth",
+                                "/"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/admin/category"
                         ).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(new JwtCookieFilter(), BearerTokenAuthenticationFilter.class)
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter))
                 )

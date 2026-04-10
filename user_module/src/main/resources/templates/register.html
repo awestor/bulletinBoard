@@ -1,14 +1,43 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Календарь Поздравлений</title>
-    <link rel="stylesheet" th:href="@{/css/main.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-</head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
 <body>
-register page
+<div th:replace="fragments/header :: header"></div>
+
+<main class="auth-container">
+    <div class="auth-box">
+        <h2>Регистрация</h2>
+
+        <form id="registerForm" class="auth-form">
+            <div class="form-group">
+                <input type="text" id="name" placeholder="Имя" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Пароль" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="confirmPassword" placeholder="Подтвердите пароль" required>
+            </div>
+            <button type="submit" id="registerBtn">Зарегистрироваться</button>
+        </form>
+
+        <div class="auth-divider">или</div>
+
+        <button id="googleRegisterBtn" class="google-btn">
+            <img src="/img/google-icon.png" alt="Google"> Зарегистрироваться через Google
+        </button>
+
+        <div class="auth-links">
+            <a href="/login">Уже есть аккаунт? Войти</a>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+</main>
+
+<script type="module" src="/static/js/auth/registerForm.js"></script>
 </body>
 </html>

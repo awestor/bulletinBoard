@@ -3,6 +3,8 @@ package ru.daniil.user.service.user;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,8 +14,10 @@ import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.request.auth.RegistrationRequest;
 import ru.daniil.core.enums.AuthProvider;
+import ru.daniil.image.service.user.UserImageService;
 import ru.daniil.user.repository.UserRepository;
 
+import java.io.FileNotFoundException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -25,12 +29,15 @@ public class UserServiceImpl implements UserService {
     );
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserImageService userImageService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           UserImageService userImageService) {
         this.userRepository = userRepository;
-
         this.passwordEncoder = passwordEncoder;
+        this.userImageService = userImageService;
     }
 
     @Override
@@ -84,6 +91,14 @@ public class UserServiceImpl implements UserService {
         }
 
         return (User) authentication.getPrincipal();
+    }
+
+    @Override
+    @Cacheable(value = "userImages",
+            key = "#username + '_' + #file.getOriginalFilename()", unless = "#result == null")
+    public String getUserAvatar(String username) {
+        Optional<User> user = userRepository.findByLogin(username);
+        return user.map(value -> userImageService.completePath(value.getImageName())).orElse(null);
     }
 
     @Override

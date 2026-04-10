@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = "ru.daniil.user")
 @EnableJpaRepositories(basePackages = "ru.daniil.user.repository")
 @EntityScan(basePackages = "ru.daniil.core.entity")
-@Order(3)
+@Order(4)
 public class UserModuleConfig {
     // Этот класс инициализирует компоненты user_module
 }

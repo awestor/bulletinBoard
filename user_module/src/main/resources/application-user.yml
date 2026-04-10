@@ -67,9 +67,7 @@ user:
       max-size: 2MB
       allowed-formats: jpg,png,webp
 
-# Путь для загрузки файлов
-file:
-  upload-dir: ${FILE_UPLOAD_DIR:uploads/users/}
+
 
 logging:
   level:

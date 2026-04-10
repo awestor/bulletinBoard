@@ -1,4 +1,4 @@
-package ru.daniil.product.repository;
+package ru.daniil.image.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

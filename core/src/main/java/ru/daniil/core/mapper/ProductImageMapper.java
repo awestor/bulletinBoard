@@ -10,7 +10,7 @@ import java.util.List;
 public interface ProductImageMapper {
 
     @Mapping(target = "productId", source = "product.id")
-    @Mapping(target = "fullPath", source = "path", qualifiedByName = "buildFullImagePath")
+    @Mapping(target = "fullPath", source = "name", qualifiedByName = "buildFullImagePath")
     @Mapping(target = "isMain", source = "isMain")
     ProductImageResponse toResponse(ProductImage productImage, @Context String productImagePath);
 

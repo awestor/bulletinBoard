@@ -12,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.request.auth.LoginRequest;
 import ru.daniil.core.request.auth.RegistrationRequest;
@@ -19,10 +20,8 @@ import ru.daniil.core.response.auth.JwtResponse;
 import ru.daniil.core.enums.AuthProvider;
 import ru.daniil.core.exceptions.UserBlockedExeption;
 import ru.daniil.core.exceptions.UserNotFoundException;
+import ru.daniil.user.service.auth.*;
 import ru.daniil.user.service.user.UserService;
-import ru.daniil.user.service.auth.AuthenticationServiceImpl;
-import ru.daniil.user.service.auth.KeycloakService;
-import ru.daniil.user.service.auth.UserDetailsServiceImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -51,6 +50,12 @@ class AuthenticationServiceImplTest {
     private UserService userService;
 
     @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private AuthCookieService authCookieService;
+
+    @Mock
     private HttpServletResponse response;
 
     private AuthenticationManager authenticationManager;
@@ -71,7 +76,9 @@ class AuthenticationServiceImplTest {
                 authenticationConfiguration,
                 keycloakService,
                 userDetailsService,
-                userService
+                userService,
+                passwordEncoder,
+                authCookieService
         );
 
         registrationRequest = RegistrationRequest.builder()
@@ -110,6 +117,7 @@ class AuthenticationServiceImplTest {
         assertEquals(jwtResponse, result);
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(keycloakService, never()).createUserInKeycloak(any(), anyString(), any());
+        verify(authCookieService).setAuthCookies(response, jwtResponse.getAccessToken(), "testuser");
     }
 
     @Test
@@ -126,6 +134,7 @@ class AuthenticationServiceImplTest {
         assertNotNull(result);
         assertEquals(jwtResponse, result);
         verify(keycloakService).createUserInKeycloak(user, "Test123!$%", response);
+        verify(authCookieService).setAuthCookies(response, jwtResponse.getAccessToken(), "testuser");
     }
 
     @Test
@@ -142,6 +151,7 @@ class AuthenticationServiceImplTest {
         verify(authenticationManager, never()).authenticate(any());
         verify(keycloakService, never()).getAdminToken();
         verify(keycloakService, never()).findUserInKeycloak(anyString(), anyString());
+        verify(authCookieService, never()).setAuthCookies(any(), anyString(), anyString());
     }
 
     @Test
@@ -182,7 +192,7 @@ class AuthenticationServiceImplTest {
 
     @Test
     void authenticate_WithKeycloakCreationError_ShouldThrowRuntimeException() throws Exception {
-        when(userDetailsService.loadUserByUsername("testuser")).thenReturn((UserDetails)  user);
+        when(userDetailsService.loadUserByUsername("testuser")).thenReturn((UserDetails) user);
         when(keycloakService.getAdminToken()).thenReturn("admin-token");
         when(keycloakService.findUserInKeycloak("testuser", "admin-token"))
                 .thenReturn(Optional.empty());
@@ -192,8 +202,20 @@ class AuthenticationServiceImplTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authenticationService.authenticate(loginRequest, response));
 
-        System.out.println(exception.getMessage());
         assertTrue(exception.getMessage().contains("Ошибка при при создании пользователя в Keycloak"));
+        verify(authCookieService, never()).setAuthCookies(any(), anyString(), anyString());
+    }
+
+    @Test
+    void logout_ShouldCallKeycloakLogoutAndClearCookies() {
+        String refreshToken = "refresh-token";
+        doNothing().when(keycloakService).logout(refreshToken, response);
+        doNothing().when(authCookieService).clearAuthCookies(response);
+
+        authenticationService.logout(refreshToken, response);
+
+        verify(keycloakService).logout(refreshToken, response);
+        verify(authCookieService).clearAuthCookies(response);
     }
 
     @Test
@@ -209,15 +231,26 @@ class AuthenticationServiceImplTest {
     }
 
     @Test
-    void exchangeCodeForToken_ShouldReturnJwtResponse() {
+    void authByToken_ShouldReturnJwtResponse() {
         String code = "test-code";
-        when(keycloakService.exchange(code)).thenReturn(jwtResponse);
+        String validAccessToken = createTestJwtToken();
+        JwtResponse validJwtResponse = JwtResponse.builder()
+                .accessToken(validAccessToken)
+                .expiresIn(3600L)
+                .type("Bearer")
+                .build();
 
-        JwtResponse result = authenticationService.exchangeCodeForToken(code);
+        when(keycloakService.exchange(code)).thenReturn(validJwtResponse);
+        when(userService.existsByEmail("test@test.com")).thenReturn(true); // Пользователь уже существует
+
+        JwtResponse result = authenticationService.authByToken(code, AuthProvider.GOOGLE.toString(), response);
 
         assertNotNull(result);
-        assertEquals(jwtResponse, result);
+        assertEquals(validJwtResponse, result);
         verify(keycloakService).exchange(code);
+        verify(userService).existsByEmail("test@test.com");
+        // Проверяем, что cookies установлены
+        verify(authCookieService).setAuthCookies(response, validAccessToken, "testuser");
     }
 
     @Test
@@ -255,48 +288,124 @@ class AuthenticationServiceImplTest {
     }
 
     @Test
-    void register_WithNewUser_ShouldRegister() {
+    void authByToken_WithNewUser_ShouldRegisterAndSetCookies() {
+        String code = "test-code";
         String accessToken = createTestJwtToken();
-        JwtResponse tokenWithRealJwt = JwtResponse.builder()
+        JwtResponse jwtResponseWithToken = JwtResponse.builder()
                 .accessToken(accessToken)
                 .expiresIn(3600L)
                 .type("Bearer")
                 .build();
 
+        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithToken);
         when(userService.existsByEmail("test@test.com")).thenReturn(false);
+        when(userService.existsByLogin("testuser")).thenReturn(false);
         when(userService.registerUserWithoutValidation(any(RegistrationRequest.class)))
                 .thenReturn(user);
 
-        authenticationService.register(tokenWithRealJwt, AuthProvider.GOOGLE);
+        JwtResponse result = authenticationService.authByToken(code, AuthProvider.GOOGLE.toString(), response);
 
+        assertNotNull(result);
+        assertEquals(jwtResponseWithToken, result);
+        verify(keycloakService).exchange(code);
         verify(userService).existsByEmail("test@test.com");
+        verify(userService).existsByLogin("testuser");
         verify(userService).registerUserWithoutValidation(any(RegistrationRequest.class));
+        verify(authCookieService).setAuthCookies(response, accessToken, "testuser");
     }
 
     @Test
-    void register_WithExistingUser_ShouldSkipRegistration() {
+    void authByToken_WithExistingUser_ShouldSkipRegistrationButSetCookies() {
+        String code = "test-code";
         String accessToken = createTestJwtToken();
-        JwtResponse tokenWithRealJwt = JwtResponse.builder()
+        JwtResponse jwtResponseWithToken = JwtResponse.builder()
                 .accessToken(accessToken)
                 .expiresIn(3600L)
                 .type("Bearer")
                 .build();
 
+        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithToken);
         when(userService.existsByEmail("test@test.com")).thenReturn(true);
 
-        authenticationService.register(tokenWithRealJwt, AuthProvider.GOOGLE);
+        JwtResponse result = authenticationService.authByToken(code, AuthProvider.GOOGLE.toString(), response);
 
+        assertNotNull(result);
+        assertEquals(jwtResponseWithToken, result);
+        verify(keycloakService).exchange(code);
+        verify(userService).existsByEmail("test@test.com");
+        verify(userService, never()).existsByLogin(anyString());
         verify(userService, never()).registerUserWithoutValidation(any());
+        verify(authCookieService).setAuthCookies(response, accessToken, "testuser");
     }
 
     @Test
-    void register_WithInvalidToken_ShouldThrowRuntimeException() {
-        JwtResponse invalidToken = JwtResponse.builder()
-                .accessToken("invalid.token")
+    void authByToken_WithExistingLogin_ShouldGenerateUniqueLogin() {
+        String code = "test-code";
+        String accessToken = createTestJwtToken();
+        JwtResponse jwtResponseWithToken = JwtResponse.builder()
+                .accessToken(accessToken)
+                .expiresIn(3600L)
+                .type("Bearer")
                 .build();
 
+        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithToken);
+        when(userService.existsByEmail("test@test.com")).thenReturn(false);
+        when(userService.existsByLogin("testuser")).thenReturn(true);
+        when(userService.registerUserWithoutValidation(any(RegistrationRequest.class)))
+                .thenReturn(user);
+
+        JwtResponse result = authenticationService.authByToken(code, AuthProvider.GOOGLE.toString(), response);
+
+        assertNotNull(result);
+        assertEquals(jwtResponseWithToken, result);
+        verify(keycloakService).exchange(code);
+        verify(userService).existsByLogin("testuser");
+        verify(userService).registerUserWithoutValidation(argThat(request ->
+                request.getLogin() != null &&
+                        !request.getLogin().equals("testuser") &&
+                        request.getLogin().length() <= 16
+        ));
+        verify(authCookieService).setAuthCookies(response, accessToken, "testuser");
+    }
+
+    @Test
+    void authByToken_WithInvalidToken_ShouldThrowRuntimeException() {
+        String code = "test-code";
+        String invalidToken = "invalid.token";
+        JwtResponse jwtResponseWithInvalidToken = JwtResponse.builder()
+                .accessToken(invalidToken)
+                .expiresIn(3600L)
+                .type("Bearer")
+                .build();
+
+        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithInvalidToken);
+
         assertThrows(RuntimeException.class,
-                () -> authenticationService.register(invalidToken, AuthProvider.GOOGLE));
+                () -> authenticationService.authByToken(code, AuthProvider.GOOGLE.toString(), response));
+
+        verify(authCookieService, never()).setAuthCookies(any(), anyString(), anyString());
+    }
+
+    @Test
+    void authByToken_WithRegistrationError_ShouldThrowBadCredentialsException() {
+        String code = "test-code";
+        String accessToken = createTestJwtToken();
+        JwtResponse jwtResponseWithToken = JwtResponse.builder()
+                .accessToken(accessToken)
+                .expiresIn(3600L)
+                .type("Bearer")
+                .build();
+
+        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithToken);
+        when(userService.existsByEmail("test@test.com")).thenReturn(false);
+        when(userService.existsByLogin("testuser")).thenReturn(false);
+        when(userService.registerUserWithoutValidation(any(RegistrationRequest.class)))
+                .thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(BadCredentialsException.class,
+                () -> authenticationService.authByToken(code, AuthProvider.GOOGLE.toString(), response));
+
+        verify(authCookieService, never()).setAuthCookies(any(), anyString(), anyString());
     }
 
     private String createTestJwtToken() {
@@ -307,6 +416,7 @@ class AuthenticationServiceImplTest {
             claims.put("email", "test@test.com");
             claims.put("name", "testuser");
             claims.put("preferred_username", "testuser");
+            claims.put("sub", "GOOGLE|123456789");
 
             ObjectMapper mapper = new ObjectMapper();
             String payloadJson = mapper.writeValueAsString(claims);

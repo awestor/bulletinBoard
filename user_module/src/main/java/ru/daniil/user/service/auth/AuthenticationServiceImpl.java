@@ -8,20 +8,22 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.request.auth.LoginRequest;
-import ru.daniil.core.request.auth.RegistrationRequest;
-import ru.daniil.core.response.auth.JwtResponse;
 import ru.daniil.core.enums.AuthProvider;
 import ru.daniil.core.exceptions.UserBlockedExeption;
 import ru.daniil.core.exceptions.UserNotFoundException;
+import ru.daniil.core.request.auth.LoginRequest;
+import ru.daniil.core.request.auth.RegistrationRequest;
+import ru.daniil.core.response.auth.JwtResponse;
 import ru.daniil.user.service.user.UserService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -30,15 +32,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final KeycloakService keycloakService;
     private final UserDetailsServiceImpl userDetailsService;
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthCookieService authCookieService;
 
     public AuthenticationServiceImpl(
             AuthenticationConfiguration authenticationConfiguration,
             KeycloakService keycloakService,
-            UserDetailsServiceImpl userDetailsService, UserService userService) {
+            UserDetailsServiceImpl userDetailsService, UserService userService, PasswordEncoder passwordEncoder, AuthCookieService authCookieService) {
         this.authenticationManager = authenticationConfiguration.getAuthenticationManager();
         this.keycloakService = keycloakService;
         this.userDetailsService = userDetailsService;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.authCookieService = authCookieService;
     }
 
     @Override
@@ -53,8 +59,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @Transactional
-    public JwtResponse exchangeCodeForToken(String code) {
-        return keycloakService.exchange(code);
+    public JwtResponse authByToken(String code, String provider, HttpServletResponse response) {
+        JwtResponse jwtResponse = keycloakService.exchange(code);
+        register(jwtResponse, AuthProvider.valueOf(provider), response);
+
+        return jwtResponse;
     }
 
     @Override
@@ -97,8 +106,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     }
                 }
 
-                return keycloakService.authenticateAndGetTokens(
+
+                JwtResponse jwtResponse = keycloakService.authenticateAndGetTokens(
                         user.getUsername(), request.getPassword(), response);
+                authCookieService.setAuthCookies(response, jwtResponse.getAccessToken(), request.getUsername());
+                return jwtResponse;
+
             } catch (Exception e) {
                 System.err.println("Keycloak error: " + e.getMessage());
                 throw new RuntimeException("Ошибка при получении токенов от Keycloak:" + e.getMessage());
@@ -123,24 +136,42 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void logout(String refreshToken, HttpServletResponse response) {
         keycloakService.logout(refreshToken, response);
+        authCookieService.clearAuthCookies(response);
     }
 
-    @Override
-    public void register(JwtResponse data, AuthProvider provider) {
+    private void register(JwtResponse data, AuthProvider provider, HttpServletResponse response) {
         String accessToken = data.getAccessToken();
         Map<String, Object> claims = decodeJwtToken(accessToken);
 
         if(userService.existsByEmail((String) claims.get("email"))){
+            authCookieService.setAuthCookies(response, data.getAccessToken(), (String) claims.get("name"));
             return;
         }
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
-        registrationRequest.setLogin((String) claims.get("name"));
+
+        if(userService.existsByLogin((String) claims.get("name"))){
+            registrationRequest.setLogin(
+                    UUID.randomUUID().toString().replace("-", "").substring(0, 16)
+            );
+        }
+        else {
+            registrationRequest.setLogin((String) claims.get("name"));
+        }
+
         registrationRequest.setEmail((String) claims.get("email"));
         registrationRequest.setAuthProvider(provider);
         registrationRequest.setPassword(null);
 
-        userService.registerUserWithoutValidation(registrationRequest);
+        try {
+            userService.registerUserWithoutValidation(registrationRequest);
+            //В cookie указывается именно имя аккаунта внешнего провайдера, а не его фактический ник,
+            // ведь его дубль в БД не столь важен для отображения и нужен только для осуществления связей в БД
+            authCookieService.setAuthCookies(response, data.getAccessToken(), (String) claims.get("name"));
+        }
+        catch(Exception ex){
+            throw new BadCredentialsException("При создании пользователя с переданными данными возникла ошибка");
+        }
     }
 
     /**

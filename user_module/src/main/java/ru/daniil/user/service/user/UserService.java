@@ -38,6 +38,8 @@ public interface UserService {
      */
     User getAuthUser();
 
+    String getUserAvatar(String username);
+
     /**
      * Проверяет существование пользователя по email
      * @param email электронная почта пользователя

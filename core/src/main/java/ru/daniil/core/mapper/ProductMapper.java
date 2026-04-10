@@ -38,7 +38,7 @@ public interface ProductMapper {
         return images.stream()
                 .filter(img -> Boolean.TRUE.equals(img.getIsMain()))
                 .findFirst()
-                .map(ru.daniil.core.entity.base.product.ProductImage::getPath)
-                .orElse(images.getFirst().getPath());
+                .map(ru.daniil.core.entity.base.product.ProductImage::getName)
+                .orElse(images.getFirst().getName());
     }
 }

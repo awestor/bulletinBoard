@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:fragment="head">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MyShop</title>
+        <link rel="stylesheet" th:href="@{/css/global.css}">
+        <link rel="stylesheet" th:href="@{/css/header.css}">
+    </head>
+
+    <header th:fragment="header">
+        <div class="header">
+            <div class="headerContainer">
+                <div class="headerLogo">
+                    <a th:href="@{/}" class="logo">
+                        <span class="logoIcon">🛍️</span>
+                        <span class="logoText">MyShop</span>
+                    </a>
+                </div>
+
+                <nav class="headerNav">
+                    <a th:href="@{/}" class="navLink">Главная</a>
+                    <a th:href="@{/cabinet}" id="cabinetLink" class="navLink" style="display: none;">Личный кабинет</a>
+                </nav>
+
+                <div id="authStatus" class="headerAuth">
+                    <!-- По умолчанию показываем кнопки -->
+                    <div class="authButtons">
+                        <a th:href="@{/login}" class="btnOutline">Вход</a>
+                        <a th:href="@{/register}" class="btnPrimary">Регистрация</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Скрытые SVG шаблоны -->
+        <div style="display: none;">
+            <svg id="defaultAvatarSvg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="50" fill="url(#avatarGradient)"/>
+                <circle cx="50" cy="35" r="15" fill="white" fill-opacity="0.9"/>
+                <path d="M50 55 C35 55 22 65 20 80 L80 80 C78 65 65 55 50 55Z" fill="white" fill-opacity="0.9"/>
+                <defs>
+                    <linearGradient id="avatarGradient" x1="0" y1="0" x2="100" y2="100">
+                        <stop offset="0%" stop-color="#667eea"/>
+                        <stop offset="100%" stop-color="#764ba2"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <script th:src="@{/js/header.js}"></script>
+    </header>
+</html>

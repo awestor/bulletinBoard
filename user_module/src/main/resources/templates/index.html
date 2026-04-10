@@ -1,14 +1,63 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Календарь Поздравлений</title>
-    <link rel="stylesheet" th:href="@{/css/main.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-</head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head"></head>
 <body>
-Hello World!
+<div th:replace="fragments/header :: header"></div>
+
+<main>
+    <div class="mainContainer">
+        <aside class="filtersPanel">
+            <h2 class="filtersTitle">Фильтры</h2>
+
+            <input type="text" id="searchInput" class="searchInput"
+                   placeholder="Поиск товаров...">
+
+            <div class="filterGroup">
+                <label class="filterLabel">Категория</label>
+                <select id="categoryFilter" class="categorySelect">
+                    <option value="">Все категории</option>
+                </select>
+            </div>
+
+            <div class="filterGroup">
+                <label class="filterLabel">Цена</label>
+                <div class="priceRange">
+                    <input type="number" id="priceMin" class="priceInput"
+                           placeholder="От">
+                    <input type="number" id="priceMax" class="priceInput"
+                           placeholder="До">
+                </div>
+            </div>
+
+            <button id="applyFiltersBtn" class="applyFiltersBtn">
+                Применить фильтры
+            </button>
+        </aside>
+
+        <div class="productsContent">
+            <div class="sliderSection">
+                <h2 class="sectionTitle">Популярные товары</h2>
+                <div class="sliderContainer">
+                    <div id="featuredSlider" class="sliderTrack">
+                        <div class="loading">Загрузка...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="productsSection">
+                <h2 class="sectionTitle">Все товары</h2>
+                <div id="productsGrid" class="productsGrid">
+                    <div class="loading">Загрузка...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<link rel="stylesheet" th:href="@{/css/mainPage.css}">
+<script th:src="@{/js/main/mainFilters.js}"></script>
+<!--<script th:src="@{/js/main/mainSlider.js}"></script>
+<script th:src="@{/js/main/mainProductList.js}"></script> -->
+<script th:src="@{/js/main/categoryMenu.js}"></script>
 </body>
 </html>

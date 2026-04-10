@@ -1,4 +1,4 @@
-package ru.daniil.product.service;
+package ru.daniil.image.service;
 
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,8 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.ProductImage;
-import ru.daniil.product.repository.ProductImageRepository;
-import ru.daniil.product.service.image.ProductImageServiceImpl;
+import ru.daniil.image.repository.ProductImageRepository;
+import ru.daniil.image.service.product.ProductImageServiceImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,7 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProductImageServiceImplTest {
@@ -45,7 +46,7 @@ class ProductImageServiceImplTest {
 
         productImage = new ProductImage();
         productImage.setId(1L);
-        productImage.setPath("test.jpg");
+        productImage.setName("test.jpg");
         productImage.setIsMain(false);
     }
 

@@ -1,0 +1,24 @@
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="product-detail">
+    <div class="product-gallery">
+        <img id="mainImage" class="main-photo">
+        <div id="thumbnailsList" class="thumbnails"></div>
+    </div>
+
+    <div class="product-info-short">
+        <h1 id="productName"></h1>
+        <div id="characteristics"></div>
+        <button id="addToCartBtn">В корзину</button>
+    </div>
+
+    <div class="product-description-full">
+        <h3>Описание</h3>
+        <div id="fullDescription"></div>
+    </div>
+</div>
+
+<script src="/static/js/product/product-detail-images-1.js"></script>
+<script src="/static/js/product/product-detail-info-2.js"></script>
+</body>

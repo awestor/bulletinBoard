@@ -1,4 +1,4 @@
-package ru.daniil.product.service.image;
+package ru.daniil.image.service.product;
 
 import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.ProductImage;

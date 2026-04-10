@@ -1,0 +1,316 @@
+/* Header основной */
+.header {
+    background: var(--white);
+    box-shadow: var(--shadowMd);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(33, 150, 243, 0.1);
+}
+
+.headerContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.75rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+/* Логотип */
+.headerLogo {
+    flex-shrink: 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.logo:hover {
+    transform: translateY(-1px);
+}
+
+.logoIcon {
+    font-size: 1.8rem;
+}
+
+.logoText {
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blueDark) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Навигация */
+.headerNav {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+}
+
+.navLink {
+    color: var(--grayDark);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    position: relative;
+    transition: var(--transition);
+}
+
+.navLink::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--blueDark));
+    transition: var(--transition);
+}
+
+.navLink:hover {
+    color: var(--blue);
+}
+
+.navLink:hover::after {
+    width: 100%;
+}
+
+/* Блок авторизации - фиксированная ширина */
+.headerAuth {
+    flex-shrink: 0;
+    min-width: 180px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Кнопки для неавторизованных - единый стиль */
+.authButtons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btnOutline {
+    padding: 0.5rem 1.2rem;
+    border: 1.5px solid var(--blue);
+    background: transparent;
+    color: var(--blue);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    min-width: 85px;
+}
+
+.btnOutline:hover {
+    background: var(--blueLight);
+    transform: translateY(-1px);
+}
+
+.btnPrimary {
+    padding: 0.5rem 1.2rem;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blueDark) 100%);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    min-width: 85px;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+}
+
+.btnPrimary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+}
+
+/* Пользовательский блок */
+.authUser {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.userAvatarContainer {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.userAvatarContainer:hover {
+    transform: scale(1.05);
+}
+
+.userAvatarDefault,
+.userAvatarImage {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.userDropdown {
+    position: relative;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.userName {
+    color: var(--grayDarker);
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.userName::after {
+    content: '▼';
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+    color: var(--gray);
+    transition: var(--transition);
+}
+
+.userDropdown.active .userName::after {
+    transform: rotate(180deg);
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--shadowLg);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: var(--transition);
+    z-index: 1001;
+    overflow: hidden;
+}
+
+.userDropdown.active .dropdownMenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdownItem {
+    display: block;
+    padding: 0.75rem 1.2rem;
+    color: var(--grayDarker);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    cursor: pointer;
+    background: var(--white);
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.dropdownItem:hover {
+    background: var(--blueLight);
+    color: var(--blue);
+}
+
+.dropdownDivider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gray), transparent);
+    margin: 0.25rem 0;
+}
+
+.logoutItem {
+    color: var(--greenDark);
+}
+
+.logoutItem:hover {
+    background: var(--greenLight);
+    color: var(--greenDarker);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .headerContainer {
+        padding: 0.75rem 1rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .headerNav {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .logoText {
+        font-size: 1.1rem;
+    }
+
+    .userName span {
+        display: none;
+    }
+
+    .userName::after {
+        margin-left: 0;
+    }
+
+    .dropdownMenu {
+        right: -50px;
+    }
+
+    .headerAuth {
+        min-width: auto;
+    }
+
+    .btnOutline, .btnPrimary {
+        min-width: 75px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .headerContainer {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .headerNav {
+        order: 2;
+    }
+
+    .headerAuth {
+        order: 1;
+        width: 100%;
+        justify-content: center;
+    }
+}

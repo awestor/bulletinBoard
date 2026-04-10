@@ -9,7 +9,7 @@ import ru.daniil.core.entity.base.product.ProductImage;
 import ru.daniil.core.request.CreateProductRequest;
 import ru.daniil.product.repository.ProductRepository;
 import ru.daniil.product.service.attribute.ProductAttributeService;
-import ru.daniil.product.service.image.ProductImageService;
+import ru.daniil.image.service.product.ProductImageService;
 
 import java.io.IOException;
 import java.util.List;

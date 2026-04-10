@@ -35,20 +35,19 @@ public class AuthApiController {
     @PostMapping("/token")
     @Hidden
     @Operation(summary = "Получение токена после входа в систему через IdP")
-    public ResponseEntity<?> exchangeCode(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> exchangeCode(@RequestBody Map<String, String> payload,
+                                          HttpServletResponse response) {
         String code = payload.get("code");
         String provider = payload.get("provider");
-        JwtResponse jwtResponse = authenticationService.exchangeCodeForToken(code);
 
         try {
-            System.err.println("Провайдер равен: " + provider);
-            authenticationService.register(jwtResponse, AuthProvider.valueOf(provider));
+            JwtResponse jwtResponse = authenticationService.authByToken(code, provider, response);
+
+            return ResponseEntity.ok(jwtResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new MessageResponse("Ошибка на внутренней стороне при обработке входа"));
         }
-
-        return ResponseEntity.ok(jwtResponse);
     }
 
     @PostMapping("/login")
@@ -58,9 +57,10 @@ public class AuthApiController {
             HttpServletResponse response) {
         try {
             JwtResponse jwtResponse = authenticationService.authenticate(request, response);
+
             return ResponseEntity.ok(jwtResponse);
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new MessageResponse(e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -109,10 +109,11 @@ public class AuthApiController {
         try {
             String refreshToken = getRefreshTokenFromCookie(request);
             authenticationService.logout(refreshToken, response);
+
             return ResponseEntity.ok(new MessageResponse("Успешный выход из системы"));
         } catch (Exception e) {
             authenticationService.logout(null, response);
-            return ResponseEntity.ok(new MessageResponse("Выход выполнен"));
+            return ResponseEntity.ok(new MessageResponse("Выход не выполнен"));
         }
     }
 
@@ -121,9 +122,8 @@ public class AuthApiController {
     @Hidden
     @Operation(summary = "Регистрация по токену")
     public ResponseEntity<?> registerByToken(
-            @Valid @RequestBody JwtResponse data, String authProvider) {
+            @Valid @RequestBody JwtResponse data, String authProvider, HttpServletResponse response) {
         try {
-            authenticationService.register(data, AuthProvider.valueOf(authProvider));
             return ResponseEntity.ok(new MessageResponse("Данные пользователя зарегистрированы"));
 
         } catch (Exception e) {
