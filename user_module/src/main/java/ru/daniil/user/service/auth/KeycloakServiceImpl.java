@@ -108,7 +108,6 @@ public class KeycloakServiceImpl implements KeycloakService {
     @Override
     public void createUserInKeycloak(User user, String rawPassword, HttpServletResponse response) {
         try {
-            System.err.println("System property KEYCLOAK_CLIENT_SECRET: " + System.getProperty("KEYCLOAK_CLIENT_SECRET"));
             String adminToken = getAdminToken();
 
             Optional<String> existingUserId = findUserInKeycloak(user.getUsername(), adminToken);
@@ -298,7 +297,7 @@ public class KeycloakServiceImpl implements KeycloakService {
         body.add("code", code);
         body.add("client_id", clientId);
         body.add("client_secret", clientSecret);
-        body.add("redirect_uri", "http://localhost:8080/test-auth");
+        body.add("redirect_uri", "http://localhost:8080/login");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 

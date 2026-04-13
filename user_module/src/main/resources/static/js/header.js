@@ -31,7 +31,7 @@ function getDefaultAvatarSvg() {
 async function loadUserAvatar(username) {
     if (!username) return null;
     try {
-        const response = await fetch(`/api/users/${encodeURIComponent(username)}/avatar`, {
+        const response = await fetch(`/api/users/avatar`, {
             credentials: 'include'
         });
         if (response.ok) {
@@ -83,9 +83,11 @@ async function updateAuthStatus() {
 
         // Загружаем реальный аватар
         const avatarUrl = await loadUserAvatar(username);
-        const avatarContainer = document.getElementById('avatarContainer');
-        if (avatarContainer && avatarUrl) {
-            avatarContainer.innerHTML = `<img src="${avatarUrl}" alt="${username}" class="userAvatarImage" onerror="this.onerror=null; this.parentElement.innerHTML = \`${defaultSvg}\`">`;
+        if (avatarUrl != 'none'){
+            const avatarContainer = document.getElementById('avatarContainer');
+            if (avatarContainer && avatarUrl) {
+                avatarContainer.innerHTML = `<img src="${avatarUrl}" alt="${username}" class="userAvatarImage" onerror="this.onerror=null; this.parentElement.innerHTML = \`${defaultSvg}\`">`;
+            }
         }
     } else {
         if (cabinetLink) {

@@ -58,7 +58,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public JwtResponse authByToken(String code, String provider, HttpServletResponse response) {
         JwtResponse jwtResponse = keycloakService.exchange(code);
-        register(jwtResponse, AuthProvider.valueOf(provider), response);
+        register(jwtResponse, AuthProvider.valueOf(provider.toUpperCase()), response);
 
         return jwtResponse;
     }
@@ -141,7 +141,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Map<String, Object> claims = decodeJwtToken(accessToken);
 
         if(userService.existsByEmail((String) claims.get("email"))){
-            authCookieService.setAuthCookies(response, data.getAccessToken(), (String) claims.get("name"));
+            String username = (String) claims.get("name");
+            authCookieService.setAuthCookies(response, accessToken, username);
             return;
         }
 

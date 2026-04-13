@@ -53,6 +53,11 @@ public class UserImageServiceImpl implements UserImageService {
     }
 
     public String completePath(String filename) {
+        if (filename == null){
+            methodLogger.info("Переданное название файла = null");
+            return null;
+        }
+        methodLogger.info("Переданное название файла = {}", filename);
         Path path = Paths.get(uploadDir, filename);
         if (!Files.exists(path)) {
             throw new BadCredentialsException("Изображение пользовательского аватара не найдено: " + filename);

@@ -2,6 +2,7 @@ package ru.daniil.user.service.user;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
@@ -92,11 +93,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "userImages",
-            key = "#username + '_' + #file.getOriginalFilename()", unless = "#result == null")
-    public String getUserAvatar(String username) {
-        Optional<User> user = userRepository.findByLogin(username);
-        return user.map(value -> userImageService.completePath(value.getImageName())).orElse(null);
+
+    public String getUserAvatar(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()){
+            return userImageService.completePath(user.get().getImageName());
+        }
+        else {
+            throw new NotFoundException("Пользователь не был найден");
+        }
     }
 
     @Override

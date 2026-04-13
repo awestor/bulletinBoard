@@ -41,8 +41,9 @@ public class AuthApiController {
         String provider = payload.get("provider");
 
         try {
+            System.err.println("Пользователь обратился с токеном");
             JwtResponse jwtResponse = authenticationService.authByToken(code, provider, response);
-
+            System.err.println("Токен был обработан");
             return ResponseEntity.ok(jwtResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
