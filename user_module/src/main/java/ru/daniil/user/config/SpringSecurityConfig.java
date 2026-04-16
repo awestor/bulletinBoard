@@ -2,6 +2,7 @@ package ru.daniil.user.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,16 +14,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.daniil.user.config.keycloak.JwtConverter;
+import ru.daniil.user.service.auth.AuthenticationService;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Import(PasswordEncoderConfig.class)
 public class SpringSecurityConfig {
 
     private final JwtConverter jwtConverter;
+    private final JwtCookieFilter jwtCookieFilter;
 
-    public SpringSecurityConfig(JwtConverter jwtConverter) {
+    public SpringSecurityConfig(JwtConverter jwtConverter,
+                                JwtCookieFilter jwtCookieFilter
+    ) {
         this.jwtConverter = jwtConverter;
+        this.jwtCookieFilter = jwtCookieFilter;
     }
 
     @Bean
@@ -46,11 +53,12 @@ public class SpringSecurityConfig {
                                 "/"
                         ).permitAll()
                         .requestMatchers(
-                                "/api/admin/category"
+                                "/api/admin/**",
+                                "/api/test/**"
                         ).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtCookieFilter(), BearerTokenAuthenticationFilter.class)
+                .addFilterBefore(jwtCookieFilter, BearerTokenAuthenticationFilter.class)
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter))
                 )
@@ -72,10 +80,5 @@ public class SpringSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

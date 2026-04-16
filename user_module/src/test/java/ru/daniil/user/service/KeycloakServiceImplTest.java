@@ -525,7 +525,7 @@ class KeycloakServiceImplTest {
         when(restTemplate.postForEntity(eq(tokenUrl), any(HttpEntity.class), eq(Map.class)))
                 .thenReturn(responseEntity);
 
-        JwtResponse result = keycloakService.exchange(code);
+        JwtResponse result = keycloakService.exchange(code, response);
 
         assertNotNull(result);
         assertEquals("exchanged-token", result.getAccessToken());
@@ -547,7 +547,7 @@ class KeycloakServiceImplTest {
         when(restTemplate.postForEntity(eq(tokenUrl), any(HttpEntity.class), eq(Map.class)))
                 .thenReturn(responseEntity);
 
-        JwtResponse result = keycloakService.exchange(code);
+        JwtResponse result = keycloakService.exchange(code, response);
 
         assertEquals("Bearer", result.getType());
     }

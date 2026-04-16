@@ -21,6 +21,8 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     Optional<Category> findByName(String name);
 
+    long countByType(CategoryType type);
+
     @Modifying
     @Query("UPDATE Category c SET c.parent = :newParent WHERE c IN :children")
     void updateParentForCategories(@Param("children") List<Category> children,

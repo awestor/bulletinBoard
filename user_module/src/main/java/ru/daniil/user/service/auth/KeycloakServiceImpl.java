@@ -2,6 +2,8 @@ package ru.daniil.user.service.auth;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.daniil.core.entity.base.user.User;
+import ru.daniil.core.enums.CookieType;
 import ru.daniil.core.response.auth.JwtResponse;
 
 import java.util.Map;
@@ -39,6 +42,8 @@ public class KeycloakServiceImpl implements KeycloakService {
     private String adminPassword;
 
     private static final int REFRESH_TOKEN_EXPIRY = 30 * 24 * 60 * 60; // 30 дней в секундах
+
+    private static final Logger infoLogger = LoggerFactory.getLogger("INFO-LOGGER");
 
     /**
      * Аутентификация и получение токенов
@@ -238,9 +243,7 @@ public class KeycloakServiceImpl implements KeycloakService {
             );
 
             if (response.getBody() != null && response.getBody().containsKey("access_token")) {
-                String token = (String) response.getBody().get("access_token");
-                System.err.println("Удалось получить admin token");
-                return token;
+                return (String) response.getBody().get("access_token");
             }
         } catch (Exception e) {
             System.err.println("Не удалось получить admin token");
@@ -288,7 +291,7 @@ public class KeycloakServiceImpl implements KeycloakService {
      * Преобразование ответа от keyCloak после входа с помощью внешнего провайдера
      */
     @Override
-    public JwtResponse exchange(String code){
+    public JwtResponse exchange(String code, HttpServletResponse response){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -302,17 +305,27 @@ public class KeycloakServiceImpl implements KeycloakService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
         String tokenUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
+        try {
+            ResponseEntity<Map> keycloakResponse = restTemplate.postForEntity(tokenUrl, request, Map.class);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
+            Map<String, Object> tokenResponse = keycloakResponse.getBody();
 
-        Map<String, Object> tokenResponse = response.getBody();
+            assert tokenResponse != null;
+            setRefreshTokenCookie(response, (String) tokenResponse.get("refresh_token"));
 
-        assert tokenResponse != null;
-        return JwtResponse.builder()
-                .accessToken((String) tokenResponse.get("access_token"))
-                .expiresIn(((Number) tokenResponse.get("expires_in")).longValue())
-                .type((String) tokenResponse.getOrDefault("token_type", "Bearer"))
-                .build();
+            return JwtResponse.builder()
+                    .accessToken((String) tokenResponse.get("access_token"))
+                    .expiresIn(((Number) tokenResponse.get("expires_in")).longValue())
+                    .type((String) tokenResponse.getOrDefault("token_type", "Bearer"))
+                    .build();
+
+        } catch (HttpClientErrorException e) {
+            System.err.println("=== HTTP ERROR ===");
+            System.err.println("Status: " + e.getStatusCode());
+            System.err.println("Response body: " + e.getResponseBodyAsString());
+            System.err.println("=================");
+            throw new RuntimeException("Keycloak token exchange failed: " + e.getResponseBodyAsString(), e);
+        }
     }
 
     // ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
@@ -321,13 +334,13 @@ public class KeycloakServiceImpl implements KeycloakService {
      * Установка refresh токена в httpOnly cookie
      */
     private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        Cookie cookie = new Cookie("refresh_token", refreshToken);
+        Cookie cookie = new Cookie(CookieType.REFRESH_TOKEN.toString(), refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true); // для HTTPS
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(REFRESH_TOKEN_EXPIRY);
-        // cookie.setDomain("your-domain.com"); // установите свой домен
-        cookie.setAttribute("SameSite", "Strict"); // защита от CSRF
+        // cookie.setDomain("your-domain.com");
+        cookie.setAttribute("SameSite", "Strict");
         response.addCookie(cookie);
     }
 

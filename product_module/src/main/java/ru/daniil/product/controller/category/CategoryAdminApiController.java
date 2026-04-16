@@ -6,12 +6,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 import ru.daniil.core.entity.base.product.Category;
 import ru.daniil.core.request.CreateCategoryRequest;
 import ru.daniil.product.service.category.CategoryService;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/category")
@@ -43,11 +48,19 @@ public class CategoryAdminApiController {
             @ApiResponse(responseCode = "404", description = "Категория не найдена"),
             @ApiResponse(responseCode = "409", description = "Невозможно удалить категорию, так как у неё есть дочерние категории")
     })
-    public ResponseEntity<Void> deleteCategory(
+    public Object deleteCategory(
             @Parameter(description = "Имя категории", required = true)
             @PathVariable String categoryName) {
-        categoryService.delete(categoryName);
-        return ResponseEntity.noContent().build();
+        try {
+            categoryService.delete(categoryName);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (NotFoundException ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", ex.getMessage()));
+        }
     }
 
     @PutMapping("/{categoryOldName}")

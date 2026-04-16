@@ -58,7 +58,6 @@ class AuthenticationServiceImplTest {
     @Mock
     private HttpServletResponse response;
 
-    private AuthenticationManager authenticationManager;
     private AuthenticationServiceImpl authenticationService;
 
     private RegistrationRequest registrationRequest;
@@ -67,13 +66,8 @@ class AuthenticationServiceImplTest {
     private JwtResponse jwtResponse;
 
     @BeforeEach
-    void setUp() throws Exception {
-        authenticationManager = mock(AuthenticationManager.class);
-
-        when(authenticationConfiguration.getAuthenticationManager()).thenReturn(authenticationManager);
-
+    void setUp(){
         authenticationService = new AuthenticationServiceImpl(
-                authenticationConfiguration,
                 keycloakService,
                 userDetailsService,
                 userService,
@@ -114,7 +108,6 @@ class AuthenticationServiceImplTest {
 
         assertNotNull(result);
         assertEquals(jwtResponse, result);
-        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(keycloakService, never()).createUserInKeycloak(any(), anyString(), any());
         verify(authCookieService).setAuthCookies(response, jwtResponse.getAccessToken(), "testuser");
     }
@@ -137,20 +130,29 @@ class AuthenticationServiceImplTest {
     }
 
     @Test
-    void authenticate_WithUserNotFoundLocally_ShouldTryKeycloakAuth() throws Exception {
+    void authenticate_WithUserNotFoundLocally_ShouldAuthenticateViaKeycloakAndSetCookies() {
+        String validAccessToken = createTestJwtToken();
+        JwtResponse validJwtResponse = JwtResponse.builder()
+                .accessToken(validAccessToken)
+                .expiresIn(3600L)
+                .type("Bearer")
+                .build();
+
         when(userDetailsService.loadUserByUsername("testuser"))
                 .thenThrow(new UserNotFoundException("User not found"));
         when(keycloakService.authenticateAndGetTokens("testuser", "Test123!$%", response))
-                .thenReturn(jwtResponse);
+                .thenReturn(validJwtResponse);
+
+        // Мокаем проверки в методе register()
+        when(userService.existsByEmail("test@test.com")).thenReturn(true);
 
         JwtResponse result = authenticationService.authenticate(loginRequest, response);
 
         assertNotNull(result);
-        assertEquals(jwtResponse, result);
-        verify(authenticationManager, never()).authenticate(any());
+        assertEquals(validJwtResponse, result);
         verify(keycloakService, never()).getAdminToken();
         verify(keycloakService, never()).findUserInKeycloak(anyString(), anyString());
-        verify(authCookieService, never()).setAuthCookies(any(), anyString(), anyString());
+        verify(authCookieService).setAuthCookies(response, validAccessToken, "testuser");
     }
 
     @Test
@@ -172,36 +174,24 @@ class AuthenticationServiceImplTest {
         assertThrows(BadCredentialsException.class,
                 () -> authenticationService.authenticate(loginRequest, response));
 
-        verify(authenticationManager, never()).authenticate(any());
         verify(keycloakService, never()).authenticateAndGetTokens(anyString(), anyString(), any());
     }
 
     @Test
-    void authenticate_WithInvalidCredentials_ShouldThrowBadCredentials() throws Exception {
-        when(userDetailsService.loadUserByUsername("testuser")).thenReturn((UserDetails) user);
-        doThrow(new BadCredentialsException("Invalid credentials"))
-                .when(authenticationManager).authenticate(any());
-
-        assertThrows(BadCredentialsException.class,
-                () -> authenticationService.authenticate(loginRequest, response));
-
-        verify(keycloakService, never()).getAdminToken();
-        verify(keycloakService, never()).findUserInKeycloak(anyString(), anyString());
-    }
-
-    @Test
     void authenticate_WithKeycloakCreationError_ShouldThrowRuntimeException() throws Exception {
-        when(userDetailsService.loadUserByUsername("testuser")).thenReturn((UserDetails) user);
-        when(keycloakService.getAdminToken()).thenReturn("admin-token");
+        when(userDetailsService.loadUserByUsername("testuser")).thenReturn(user);
         when(keycloakService.findUserInKeycloak("testuser", "admin-token"))
                 .thenReturn(Optional.empty());
         doThrow(new RuntimeException("Keycloak creation error"))
                 .when(keycloakService).createUserInKeycloak(user, "Test123!$%", response);
+        when(keycloakService.authenticateAndGetTokens("testuser", "Test123!$%", response))
+                .thenReturn(jwtResponse);
 
+        // В реальном коде RuntimeException оборачивается с общим сообщением
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> authenticationService.authenticate(loginRequest, response));
 
-        assertTrue(exception.getMessage().contains("Ошибка при при создании пользователя в Keycloak"));
+        assertTrue(exception.getMessage().contains("Внутренняя ошибка сервера"));
         verify(authCookieService, never()).setAuthCookies(any(), anyString(), anyString());
     }
 
@@ -239,14 +229,14 @@ class AuthenticationServiceImplTest {
                 .type("Bearer")
                 .build();
 
-        when(keycloakService.exchange(code)).thenReturn(validJwtResponse);
+        when(keycloakService.exchange(code, response)).thenReturn(validJwtResponse);
         when(userService.existsByEmail("test@test.com")).thenReturn(true); // Пользователь уже существует
 
         JwtResponse result = authenticationService.authByToken(code, AuthProvider.GOOGLE.toString(), response);
 
         assertNotNull(result);
         assertEquals(validJwtResponse, result);
-        verify(keycloakService).exchange(code);
+        verify(keycloakService).exchange(code, response);
         verify(userService).existsByEmail("test@test.com");
         // Проверяем, что cookies установлены
         verify(authCookieService).setAuthCookies(response, validAccessToken, "testuser");
@@ -296,7 +286,7 @@ class AuthenticationServiceImplTest {
                 .type("Bearer")
                 .build();
 
-        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithToken);
+        when(keycloakService.exchange(code, response)).thenReturn(jwtResponseWithToken);
         when(userService.existsByEmail("test@test.com")).thenReturn(false);
         when(userService.existsByLogin("testuser")).thenReturn(false);
         when(userService.registerUserWithoutValidation(any(RegistrationRequest.class)))
@@ -306,7 +296,7 @@ class AuthenticationServiceImplTest {
 
         assertNotNull(result);
         assertEquals(jwtResponseWithToken, result);
-        verify(keycloakService).exchange(code);
+        verify(keycloakService).exchange(code, response);
         verify(userService).existsByEmail("test@test.com");
         verify(userService).existsByLogin("testuser");
         verify(userService).registerUserWithoutValidation(any(RegistrationRequest.class));
@@ -323,14 +313,14 @@ class AuthenticationServiceImplTest {
                 .type("Bearer")
                 .build();
 
-        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithToken);
+        when(keycloakService.exchange(code, response)).thenReturn(jwtResponseWithToken);
         when(userService.existsByEmail("test@test.com")).thenReturn(true);
 
         JwtResponse result = authenticationService.authByToken(code, AuthProvider.GOOGLE.toString(), response);
 
         assertNotNull(result);
         assertEquals(jwtResponseWithToken, result);
-        verify(keycloakService).exchange(code);
+        verify(keycloakService).exchange(code, response);
         verify(userService).existsByEmail("test@test.com");
         verify(userService, never()).existsByLogin(anyString());
         verify(userService, never()).registerUserWithoutValidation(any());
@@ -347,7 +337,7 @@ class AuthenticationServiceImplTest {
                 .type("Bearer")
                 .build();
 
-        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithToken);
+        when(keycloakService.exchange(code, response)).thenReturn(jwtResponseWithToken);
         when(userService.existsByEmail("test@test.com")).thenReturn(false);
         when(userService.existsByLogin("testuser")).thenReturn(true);
         when(userService.registerUserWithoutValidation(any(RegistrationRequest.class)))
@@ -357,7 +347,7 @@ class AuthenticationServiceImplTest {
 
         assertNotNull(result);
         assertEquals(jwtResponseWithToken, result);
-        verify(keycloakService).exchange(code);
+        verify(keycloakService).exchange(code, response);
         verify(userService).existsByLogin("testuser");
         verify(userService).registerUserWithoutValidation(argThat(request ->
                 request.getLogin() != null &&
@@ -377,7 +367,7 @@ class AuthenticationServiceImplTest {
                 .type("Bearer")
                 .build();
 
-        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithInvalidToken);
+        when(keycloakService.exchange(code, response)).thenReturn(jwtResponseWithInvalidToken);
 
         assertThrows(RuntimeException.class,
                 () -> authenticationService.authByToken(code, AuthProvider.GOOGLE.toString(), response));
@@ -395,7 +385,7 @@ class AuthenticationServiceImplTest {
                 .type("Bearer")
                 .build();
 
-        when(keycloakService.exchange(code)).thenReturn(jwtResponseWithToken);
+        when(keycloakService.exchange(code, response)).thenReturn(jwtResponseWithToken);
         when(userService.existsByEmail("test@test.com")).thenReturn(false);
         when(userService.existsByLogin("testuser")).thenReturn(false);
         when(userService.registerUserWithoutValidation(any(RegistrationRequest.class)))

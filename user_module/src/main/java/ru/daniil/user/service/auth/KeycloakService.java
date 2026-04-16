@@ -21,5 +21,5 @@ public interface KeycloakService {
 
     Optional<String> findUserInKeycloak(String username, String adminToken);
 
-    JwtResponse exchange(String code);
+    JwtResponse exchange(String code, HttpServletResponse response);
 }

@@ -1,9 +1,11 @@
 package ru.daniil.product.service.category;
 
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.daniil.core.entity.base.product.Category;
@@ -18,11 +20,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    private final CacheManager cacheManager;
-
     public CategoryServiceImpl(CategoryRepository categoryRepository, CacheManager cacheManager) {
         this.categoryRepository = categoryRepository;
-        this.cacheManager = cacheManager;
     }
 
     @Override
@@ -71,13 +70,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category getById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Категория с указанным id не найдена"));
+                .orElseThrow(() -> new NotFoundException("Категория с указанным id не найдена"));
     }
 
     @Override
     public Category getByName(String categoryName) {
         return categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new RuntimeException("Категория с указанным именем не найдена"));
+                .orElseThrow(() -> new NotFoundException("Категория с указанным именем не найдена"));
     }
 
     @Override
@@ -87,7 +86,7 @@ public class CategoryServiceImpl implements CategoryService {
             unless = "#result == null || #result.isEmpty()"
     )
     public List<Category> getRootCategories() {
-        return categoryRepository.findByParentIsNull();
+        return categoryRepository.findByType(CategoryType.ROOT);
     }
 
     @Override
@@ -109,15 +108,19 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "leafCat", key = "leafCategories"),
-            @CacheEvict(value = "rootCat", key = "rootCategories")
+            @CacheEvict(value = "leafCat", key = "'leafCategories'"),
+            @CacheEvict(value = "rootCat", key = "'rootCategories'")
     })
     public void delete(String categoryName) {
-        Category category = getByName(categoryName);
+        try {
+            Category category = getByName(categoryName);
 
-        validateCategoryForDeletion(category);
+            validateCategoryForDeletion(category);
 
-        categoryRepository.delete(category);
+            categoryRepository.delete(category);
+        } catch (NotFoundException e){
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     @Override
@@ -128,9 +131,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     private void validateCategoryForDeletion(Category category) {
         if (!category.isLeaf()) {
-            throw new IllegalStateException(
-                    String.format("Удаление категории '%s' невозможно: у категории есть потомки", category.getName())
-            );
+            List<Category> children = getNextCategories(category.getName());
+            if (!children.isEmpty()) {
+                throw new IllegalStateException(
+                        String.format("Удаление категории '%s' невозможно: у категории есть потомки", category.getName())
+                );
+            }
         }
 
         if (!category.getProducts().isEmpty()) {

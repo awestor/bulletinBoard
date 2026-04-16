@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.AuthProvider;
@@ -27,17 +27,17 @@ import java.util.UUID;
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private final AuthenticationManager authenticationManager;
     private final KeycloakService keycloakService;
     private final UserDetailsServiceImpl userDetailsService;
     private final UserService userService;
     private final AuthCookieService authCookieService;
+    private static final Logger infoLogger = LoggerFactory.getLogger("INFO-LOGGER");
 
     public AuthenticationServiceImpl(
-            AuthenticationConfiguration authenticationConfiguration,
             KeycloakService keycloakService,
-            UserDetailsServiceImpl userDetailsService, UserService userService, AuthCookieService authCookieService) {
-        this.authenticationManager = authenticationConfiguration.getAuthenticationManager();
+            UserDetailsServiceImpl userDetailsService,
+            UserService userService,
+            AuthCookieService authCookieService) {
         this.keycloakService = keycloakService;
         this.userDetailsService = userDetailsService;
         this.userService = userService;
@@ -57,9 +57,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public JwtResponse authByToken(String code, String provider, HttpServletResponse response) {
-        JwtResponse jwtResponse = keycloakService.exchange(code);
-        register(jwtResponse, AuthProvider.valueOf(provider.toUpperCase()), response);
+        infoLogger.info("Пользователь пришёл с токеном и хочет обменять его на jwtResponse");
+        JwtResponse jwtResponse = keycloakService.exchange(code, response);
 
+        register(jwtResponse, AuthProvider.valueOf(provider.toUpperCase()), response);
+        infoLogger.info("jwtResponse пользователя был получен успешно");
         return jwtResponse;
     }
 
@@ -67,53 +69,51 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public JwtResponse authenticate(LoginRequest request, HttpServletResponse response) {
         try {
-            User user;
+            User user = null;
             try {
+                //авторизация через локальную БД
                 user = (User) userDetailsService.loadUserByUsername(request.getUsername());
             } catch (UserNotFoundException e){
-                try {
-                    return keycloakService.authenticateAndGetTokens(
-                            request.getUsername(),
-                            request.getPassword(),
-                            response
-                    );
-                } catch (Exception ex) {
-                    throw new BadCredentialsException(e.getMessage());
-                }
-            } catch (UserBlockedExeption e){
-                throw new BadCredentialsException(e.getMessage());
+                //ничего не делать
+            } catch (UserBlockedExeption ex){
+                throw new BadCredentialsException(ex.getMessage());
             }
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
-                            request.getPassword()
-                    )
-            );
-            try {
+
+            if (user != null) {
+                //если в локальную БД добавили, а в keycloak - нет
                 Optional<String> keycloakUserId = keycloakService.findUserInKeycloak(
                         user.getUsername(),
                         keycloakService.getAdminToken()
                 );
 
                 if (keycloakUserId.isEmpty()) {
-                    try {
-                        keycloakService.createUserInKeycloak(user, request.getPassword(), response);
-                    } catch (Exception ex){
-                        throw new RuntimeException("Ошибка при при создании пользователя в Keycloak", ex);
-                    }
+                    keycloakService.createUserInKeycloak(user, request.getPassword(), response);
                 }
-
-
-                JwtResponse jwtResponse = keycloakService.authenticateAndGetTokens(
-                        user.getUsername(), request.getPassword(), response);
-                authCookieService.setAuthCookies(response, jwtResponse.getAccessToken(), request.getUsername());
-                return jwtResponse;
-
-            } catch (Exception e) {
-                System.err.println("Keycloak error: " + e.getMessage());
-                throw new RuntimeException("Ошибка при получении токенов от Keycloak:" + e.getMessage());
-
             }
+
+            JwtResponse jwtResponse;
+            try {
+                //авторизация через keycloak
+                jwtResponse = keycloakService.authenticateAndGetTokens(
+                        request.getUsername(),
+                        request.getPassword(),
+                        response
+                );
+            } catch (Exception e) {
+                throw new BadCredentialsException("Не валидный password или username");
+            }
+
+            if (jwtResponse != null && user == null) {
+                //а это наоборот, на случай если в БД нет, но в keycloak - есть
+                register(jwtResponse, AuthProvider.KEYCLOAK, response);
+                return jwtResponse;
+            }
+
+            if (jwtResponse != null) {
+                authCookieService.setAuthCookies(response, jwtResponse.getAccessToken(), request.getUsername());
+            }
+            return jwtResponse;
+
         } catch (BadCredentialsException e) {
             throw e;
         } catch (Exception e) {
@@ -124,7 +124,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public JwtResponse refreshToken(String refreshToken, HttpServletResponse response) {
         try {
-            return keycloakService.refreshAccessToken(refreshToken, response);
+            JwtResponse jwtResponse = keycloakService.refreshAccessToken(refreshToken, response);
+            authCookieService.updateTokenCookie(response, jwtResponse.getAccessToken());
+            return jwtResponse;
         } catch (Exception e) {
             throw new RuntimeException("Не удалось обновить токен", e);
         }
