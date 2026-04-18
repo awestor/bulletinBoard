@@ -1,4 +1,4 @@
-package ru.daniil.product.service;
+package ru.daniil.product.productService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,15 +8,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.daniil.core.entity.base.product.Category;
 import ru.daniil.core.entity.base.product.Product;
-import ru.daniil.core.enums.CategoryType;import ru.daniil.product.service.category.CategoryProcessorServiceImpl;import ru.daniil.product.service.category.CategoryService;import ru.daniil.product.service.product.ProductService;
-
+import ru.daniil.core.enums.CategoryType;
+import ru.daniil.product.service.category.CategoryProcessorServiceImpl;
+import ru.daniil.product.service.category.CategoryService;
+import ru.daniil.product.service.product.ProductService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

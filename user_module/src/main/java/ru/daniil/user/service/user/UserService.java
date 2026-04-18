@@ -4,17 +4,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.request.auth.RegistrationRequest;
-
-import java.util.Optional;
+import ru.daniil.core.sharedInterfaces.UserProvider;
 
 @Service
-public interface UserService {
-    /**
-     * Возвращает пользователя по его логину
-     * @param login логин пользователя
-     * @return Пользователь или null
-     */
-    Optional<User> getByLogin(String login);
+public interface UserService extends UserProvider {
 
     /**
      * Регистрирует нового пользователя в системе и назначает ему права роли "USER"
@@ -39,18 +32,4 @@ public interface UserService {
     User getAuthUser();
 
     String getUserAvatar(String username);
-
-    /**
-     * Проверяет существование пользователя по email
-     * @param email электронная почта пользователя
-     * @return true - пользователя найден, иначе false
-     */
-    boolean existsByEmail(String email);
-
-    /**
-     * Проверяет существование пользователя по login
-     * @param login - имя пользователя
-     * @return true - пользователя найден, иначе false
-     */
-    boolean existsByLogin(String login);
 }

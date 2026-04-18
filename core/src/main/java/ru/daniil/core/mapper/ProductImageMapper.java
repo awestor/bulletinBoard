@@ -2,7 +2,7 @@ package ru.daniil.core.mapper;
 
 import org.mapstruct.*;
 import ru.daniil.core.entity.base.product.ProductImage;
-import ru.daniil.core.response.ProductImageResponse;
+import ru.daniil.core.response.product.ProductImageResponse;
 
 import java.util.List;
 

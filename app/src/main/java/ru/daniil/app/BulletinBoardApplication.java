@@ -10,6 +10,7 @@ import ru.daniil.cache.CacheModuleConfig;
 import ru.daniil.image.config.ImageModuleConfig;
 import ru.daniil.order.config.OrderModuleConfig;
 import ru.daniil.product.config.ProductModuleConfig;
+import ru.daniil.testData.config.testDataModuleConfig;
 import ru.daniil.user.config.UserModuleConfig;
 
 @SpringBootApplication
@@ -20,7 +21,8 @@ import ru.daniil.user.config.UserModuleConfig;
 		ProductModuleConfig.class,
 		UserModuleConfig.class,
 		ImageModuleConfig.class,
-		CacheModuleConfig.class
+		CacheModuleConfig.class,
+		testDataModuleConfig.class
 })
 public class BulletinBoardApplication {
 

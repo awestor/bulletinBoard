@@ -1,4 +1,4 @@
-package ru.daniil.core.response;
+package ru.daniil.core.response.product;
 
 import lombok.Builder;
 import lombok.Data;

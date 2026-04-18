@@ -14,8 +14,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.request.auth.RegistrationRequest;
 import ru.daniil.core.enums.AuthProvider;
+import ru.daniil.core.request.auth.RegistrationRequest;
 import ru.daniil.user.repository.UserRepository;
 import ru.daniil.user.service.user.UserServiceImpl;
 
@@ -43,8 +43,8 @@ class UserServiceImplTest {
     @BeforeEach
     void setUp() {
         validRequest = new RegistrationRequest();
-        validRequest.setEmail("test@test.com");
         validRequest.setLogin("testuser");
+        validRequest.setEmail("test@test.com");
         validRequest.setPassword("Test123!$%");
         validRequest.setAuthProvider(AuthProvider.LOCAL);
 

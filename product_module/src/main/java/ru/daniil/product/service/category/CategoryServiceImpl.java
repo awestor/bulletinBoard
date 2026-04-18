@@ -5,7 +5,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.daniil.core.entity.base.product.Category;
@@ -144,5 +143,10 @@ public class CategoryServiceImpl implements CategoryService {
                     String.format("Удаление категории '%s' невозможно: к категории присвоены продукты", category.getName())
             );
         }
+    }
+
+    @Override
+    public Long count(){
+        return categoryRepository.count();
     }
 }

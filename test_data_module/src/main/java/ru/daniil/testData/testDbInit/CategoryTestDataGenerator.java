@@ -1,42 +1,41 @@
-package ru.daniil.product.config.testBdInit;
+package ru.daniil.testData.testDbInit;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.daniil.core.entity.base.product.Category;
 import ru.daniil.core.enums.CategoryType;
 import ru.daniil.product.repository.CategoryRepository;
+import ru.daniil.product.service.category.CategoryService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class CategoryTestDataGenerator {
-
+    private final CategoryService categoryService;
     private final CategoryRepository categoryRepository;
 
-    public CategoryTestDataGenerator(CategoryRepository categoryRepository) {
+    public CategoryTestDataGenerator(CategoryService categoryService, CategoryRepository categoryRepository) {
+        this.categoryService = categoryService;
         this.categoryRepository = categoryRepository;
     }
 
     @Transactional
     public void generateCategories() {
-        if (categoryRepository.count() > 10) {
+        if (categoryService.count() > 10) {
             System.out.println("Категории уже существуют в БД. Пропускаем генерацию.");
             return;
         }
 
         System.out.println("Начинаем генерацию тестовых категорий...");
 
-        // 1. Создаём корневые категории (5 штук)
         List<Category> rootCategories = createRootCategories();
         categoryRepository.saveAll(rootCategories);
 
-        // 2. Для каждой корневой создаём промежуточные категории
         List<Category> allCategories = new ArrayList<>(rootCategories);
         List<Category> intermediateCategories = createIntermediateCategories(rootCategories);
         categoryRepository.saveAll(intermediateCategories);
         allCategories.addAll(intermediateCategories);
 
-        // 3. Для каждой промежуточной создаём конечные категории (LEAF)
         List<Category> leafCategories = createLeafCategories(intermediateCategories);
         categoryRepository.saveAll(leafCategories);
         allCategories.addAll(leafCategories);
@@ -48,7 +47,6 @@ public class CategoryTestDataGenerator {
     private List<Category> createRootCategories() {
         List<Category> roots = new ArrayList<>();
 
-        // Корневые категории (5 штук)
         roots.add(new Category("Электроника", CategoryType.ROOT));
         roots.add(new Category("Одежда и обувь", CategoryType.ROOT));
         roots.add(new Category("Дом и сад", CategoryType.ROOT));
@@ -63,7 +61,6 @@ public class CategoryTestDataGenerator {
 
         Map<String, List<String>> hierarchyMap = new HashMap<>();
 
-        // Определяем структуру категорий
         hierarchyMap.put("Электроника", Arrays.asList("Компьютеры и ноутбуки", "Смартфоны и гаджеты", "Аудио и видео", "Фото и видеокамеры"));
         hierarchyMap.put("Одежда и обувь", Arrays.asList("Мужская одежда", "Женская одежда", "Детская одежда", "Обувь", "Аксессуары"));
         hierarchyMap.put("Дом и сад", Arrays.asList("Мебель", "Бытовая техника", "Посуда и кухонные принадлежности", "Декор и текстиль", "Сад и огород"));
@@ -86,7 +83,6 @@ public class CategoryTestDataGenerator {
     private List<Category> createLeafCategories(List<Category> intermediateCategories) {
         List<Category> leafCategories = new ArrayList<>();
 
-        // Для каждой промежуточной категории создаём от 2 до 4 конечных категорий
         Map<String, List<String>> leafMap = new HashMap<>();
 
         leafMap.put("Компьютеры и ноутбуки", Arrays.asList("Ноутбуки", "Настольные ПК", "Моноблоки", "Комплектующие"));
@@ -126,7 +122,7 @@ public class CategoryTestDataGenerator {
                     leafCategories.add(leaf);
                 }
             } else {
-                // Если нет специфических конечных категорий, создаём стандартные
+                // Если нет специфических конечных категорий, создаются стандартные
                 leafCategories.add(new Category("Стандартные товары", CategoryType.LEAF, intermediate));
                 leafCategories.add(new Category("Премиум товары", CategoryType.LEAF, intermediate));
             }
@@ -150,7 +146,7 @@ public class CategoryTestDataGenerator {
         System.out.println("Конечных (LEAF): " + leafCount);
         System.out.println("\n=== ПРОВЕРКА ИЕРАРХИИ ===");
 
-        // Проверяем, что у каждой LEAF есть родитель INTERMEDIATE или ROOT
+        // Проверка, что у каждой LEAF есть родитель INTERMEDIATE или ROOT
         List<Category> roots = allCategories.stream()
                 .filter(c -> c.getType() == CategoryType.ROOT)
                 .toList();

@@ -1,4 +1,4 @@
-package ru.daniil.product.service;
+package ru.daniil.product.productService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,7 @@ import ru.daniil.core.request.CreateCategoryRequest;
 import ru.daniil.product.repository.CategoryRepository;
 import ru.daniil.product.service.category.CategoryServiceImpl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -149,7 +150,7 @@ class CategoryServiceImplTest {
     @Test
     void getRootCategories_ShouldReturnRootCategories() {
         List<Category> rootCategories = Collections.singletonList(parentCategory);
-        when(categoryRepository.findByParentIsNull()).thenReturn(rootCategories);
+        when(categoryRepository.findByType(CategoryType.ROOT)).thenReturn(rootCategories);
 
         List<Category> result = categoryService.getRootCategories();
 
@@ -182,7 +183,9 @@ class CategoryServiceImplTest {
 
     @Test
     void delete_WhenCategoryHasChildren_ShouldThrowException() {
+        List<Category> children = Collections.singletonList(childCategory);
         when(categoryRepository.findByName("Parent")).thenReturn(Optional.of(parentCategory));
+        when(categoryService.getNextCategories(parentCategory.getName())).thenReturn(children);
 
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> categoryService.delete("Parent"));

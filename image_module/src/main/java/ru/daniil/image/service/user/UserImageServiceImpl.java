@@ -34,22 +34,25 @@ public class UserImageServiceImpl implements UserImageService {
 
     @Cacheable(value = "userImages",
             key = "#username + '_' + #file.getOriginalFilename()", unless = "#result == null")
-    public String saveImage(MultipartFile file, String username) throws IOException {
+    public String saveImage(MultipartFile file, String username) {
         String fileName = prepareImageService.getFileUploadedName(file);
+        try{
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
 
-        Path uploadPath = Paths.get(uploadDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath);
 
-        Path filePath = uploadPath.resolve(fileName);
-        Files.copy(file.getInputStream(), filePath);
+            methodLogger.info("Файл сохранен: {}, размер: {} байт, путь: {}",
+                    fileName, file.getSize(), filePath);
 
-        methodLogger.info("Файл сохранен: {}, размер: {} байт, путь: {}",
-                fileName, file.getSize(), filePath);
-
-        userImageRepository.saveImage(fileName, username);
+            userImageRepository.saveImage(fileName, username);
         return filePath.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Возникла проблема при сохранении изображения: " + e.getMessage());
+        }
     }
 
     public String completePath(String filename) {

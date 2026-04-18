@@ -41,7 +41,7 @@ public class KeycloakServiceImpl implements KeycloakService {
     @Value("${keycloak.admin.password}")
     private String adminPassword;
 
-    private static final int REFRESH_TOKEN_EXPIRY = 30 * 24 * 60 * 60; // 30 дней в секундах
+    private static final int REFRESH_TOKEN_EXPIRY =  60 * 60; // 1 час в секундах
 
     private static final Logger infoLogger = LoggerFactory.getLogger("INFO-LOGGER");
 
@@ -85,7 +85,6 @@ public class KeycloakServiceImpl implements KeycloakService {
 
             if (keycloakResponse.getStatusCode() == HttpStatus.OK) {
                 Map<String, Object> tokenResponse = keycloakResponse.getBody();
-                System.out.println("Access token получен: " + (tokenResponse.get("access_token") != null));
 
                 String refreshToken = (String) tokenResponse.get("refresh_token");
                 setRefreshTokenCookie(response, refreshToken);
@@ -163,7 +162,6 @@ public class KeycloakServiceImpl implements KeycloakService {
                     setRefreshTokenCookie(response, newRefreshToken);
                 }
 
-                new JwtResponse();
                 return JwtResponse.builder()
                         .accessToken((String) tokenResponse.get("access_token"))
                         .expiresIn(((Number) tokenResponse.get("expires_in")).longValue())
@@ -181,7 +179,7 @@ public class KeycloakServiceImpl implements KeycloakService {
      */
     @Override
     public void clearRefreshTokenCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie("refresh_token", null);
+        Cookie cookie = new Cookie(CookieType.REFRESH_TOKEN.toString(), null);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");

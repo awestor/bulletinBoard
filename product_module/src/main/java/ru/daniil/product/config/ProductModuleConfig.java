@@ -12,5 +12,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = "ru.daniil.core.entity")
 @Order(4)
 public class ProductModuleConfig {
-    // Этот класс инициализирует компоненты user_module
+    // Этот класс инициализирует компоненты product_module
 }

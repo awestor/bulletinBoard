@@ -19,6 +19,13 @@
     </properties>
 
     <dependencies>
+        <!-- Генератор изображений -->
+        <dependency>
+            <groupId>ie.briandouglas</groupId>
+            <artifactId>PlaceholderImageGenerator</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
         <!-- JPA (Hibernate) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

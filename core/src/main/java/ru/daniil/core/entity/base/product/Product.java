@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.daniil.core.entity.base.discount.Discount;
+import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.ProductStatus;
 
 import java.math.BigDecimal;
@@ -53,6 +54,10 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", nullable = false)  // ← НОВОЕ ПОЛЕ
+    private User seller;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
 
@@ -70,9 +75,12 @@ public class Product {
         attributes = new HashSet<>();
     }
 
-    public Product(Category category, String name, BigDecimal price) {
+    public Product(Category category,
+                   User seller,
+                   String name, BigDecimal price) {
         this();
         this.category = category;
+        this.seller = seller;
         this.name = name;
         this.price = price;
         this.priceAtTime = price;

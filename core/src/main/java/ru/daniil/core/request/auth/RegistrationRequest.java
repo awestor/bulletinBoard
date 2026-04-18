@@ -1,6 +1,5 @@
 package ru.daniil.core.request.auth;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -12,15 +11,15 @@ import ru.daniil.core.enums.AuthProvider;
 @Builder
 public class RegistrationRequest {
 
-    @NotBlank(message = "Email обязателен")
-    @Email(message = "Некорректный формат email",
-            regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$")
-    private String email;
-
     @NotBlank(message = "Логин обязателен")
     @Size(min = 6, message = "Логин должен содержать минимум 6 символов")
     @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Логин может содержать только буквы, цифры и подчеркивания")
     private String login;
+
+    @NotBlank(message = "Email обязателен")
+    @Pattern(message = "Некорректный формат email",
+            regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$")
+    private String email;
 
     @NotBlank(message = "Пароль обязателен")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!$%^()_+\\-=\\[\\]{};:'\",.<>])[A-Za-z\\d!$%^()_+\\-=\\[\\]{};:'\",.<>]{8,}$",

@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,8 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.request.auth.RegistrationRequest;
 import ru.daniil.core.enums.AuthProvider;
+import ru.daniil.core.request.auth.RegistrationRequest;
 import ru.daniil.image.service.user.UserImageService;
 import ru.daniil.user.repository.UserRepository;
 
@@ -117,5 +116,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> getByLogin(String login) {
         return userRepository.findByLogin(login);
+    }
+
+    @Override
+    public Optional<User> getByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

@@ -23,5 +23,7 @@ public interface CategoryService {
 
     List<Category> getNextCategories(String categoryName);
 
+    Long count();
+
     void updateParentForCategories(Category category, Category newCategory);
 }

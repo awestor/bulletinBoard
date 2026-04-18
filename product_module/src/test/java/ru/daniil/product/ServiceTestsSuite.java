@@ -6,6 +6,6 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 
 @Suite
 @SuiteDisplayName("Tests сервисного слоя")
-@SelectPackages("ru.daniil.product.service")
+@SelectPackages("ru.daniil.product.productService")
 public class ServiceTestsSuite {
 }

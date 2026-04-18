@@ -31,7 +31,6 @@ public class AccountApiController {
             assert authentication != null;
             Jwt jwt = authentication.getToken();
             String email = jwt.getClaimAsString("email");
-            infoLogger.info("Username = {}", email);
 
             String avatarUrl = userService.getUserAvatar(email);
             return ResponseEntity.ok(Map.of("avatarUrl", avatarUrl));

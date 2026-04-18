@@ -6,6 +6,6 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 
 @Suite
 @SuiteDisplayName("Tests сервисного слоя")
-@SelectPackages("ru.daniil.image.service")
+@SelectPackages("ru.daniil.image.imageService")
 public class ImageServiceTestsSuite {
 }

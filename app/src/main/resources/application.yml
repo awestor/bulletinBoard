@@ -44,5 +44,6 @@ logging:
     org.hibernate: WARN
     org.hibernate.SQL: DEBUG
     org.springframework.web: DEBUG
+    org.springframework.web.client.RestTemplate: INFO
     org.springframework.boot.web.servlet: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE

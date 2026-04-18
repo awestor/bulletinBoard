@@ -1,17 +1,16 @@
 package ru.daniil.product.service.product;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.daniil.core.entity.base.product.Category;
 import ru.daniil.core.entity.base.product.Product;
-import ru.daniil.core.entity.base.product.ProductAttribute;
-import ru.daniil.core.entity.base.product.ProductImage;
-import ru.daniil.core.request.CreateProductRequest;
+import ru.daniil.core.response.product.ProductFilterRequest;
 import ru.daniil.product.repository.ProductRepository;
 import ru.daniil.product.service.attribute.ProductAttributeService;
-import ru.daniil.image.service.product.ProductImageService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,86 +18,22 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final ProductImageService productImageService;
     private final ProductAttributeService attributeService;
 
     public ProductServiceImpl(ProductRepository productRepository,
-                              ProductImageService productImageService,
                               ProductAttributeService attributeService) {
         this.productRepository = productRepository;
-        this.productImageService = productImageService;
         this.attributeService = attributeService;
     }
 
-    @Transactional
     @Override
-    public Product create(CreateProductRequest request, Category category) {
-        if (!category.isLeaf()) {
-            throw new RuntimeException("Продукт не может быть размещён в не конечной категории");
-        }
-
-        Product product = new Product(
-                category,
-                request.getName(),
-                request.getPrice()
-        );
-
-        product.setDescription(request.getDescription());
-        product.setSku(generateSku());
-        product.setStockQuantity(request.getStockQuantity());
-
-        if (request.getAttributes() != null && !request.getAttributes().isEmpty()) {
-            product.setAttributes(attributeService.saveMany(product, request.getAttributes()));
-        }
-
-        if (request.getImages() != null) {
-            request.getImages().forEach(image ->
-                {
-                    try {
-                        ProductImage productImage = new ProductImage(
-                                product, productImageService.saveImage(image), false);
-                        productImageService.save(productImage);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            );
-        }
-
+    public Product save(Product product){
         return productRepository.save(product);
     }
 
-    private String generateSku() {
+    @Override
+    public String generateSku() {
         return UUID.randomUUID().toString().substring(0, 12).toUpperCase();
-    }
-
-
-    @Transactional
-    @Override
-    public Product update(Long id, CreateProductRequest request, Category newCategory) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Продукт не найден"));
-
-        if (request.getCategoryId() != null && !request.getCategoryId().equals(product.getCategory().getId())) {
-
-            if (!newCategory.isLeaf()) {
-                throw new RuntimeException("Продукт не может быть назначен в не конечную категорию");
-            }
-
-            product.setCategory(newCategory);
-        }
-
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-
-        product.setStockQuantity(request.getStockQuantity());
-
-        if (request.getAttributes() != null) {
-            product.setAttributes(attributeService.setMany(product, request.getAttributes()));
-        }
-
-        return productRepository.save(product);
     }
 
     @Override
@@ -117,6 +52,38 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findByCategoryName(categoryName);
     }
 
+    @Override
+    public Page<Product> getBySeller(Long userId, Pageable pageable) {
+        return productRepository.findBySellerId(userId, pageable);
+    }
+
+    @Override
+    public Page<Product> filterProducts(ProductFilterRequest filter, Pageable pageable) {
+        filter.normalizePriceRange();
+
+        if (!filter.hasAnyFilter()) {
+            return productRepository.findAll(pageable);
+        }
+
+        // Использование универсального метода
+        Specification<Product> spec = ProductRepository.withFilters(
+                filter.getInStock(),
+                filter.getMinPrice(),
+                filter.getMaxPrice(),
+                filter.getNamePart(),
+                filter.getSkuPart(),
+                filter.getCategoryName(),
+                filter.getSellerLogin()
+        );
+
+        return productRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public long count() {
+        return productRepository.count();
+    }
+
     @Transactional
     @Override
     public void updateStock(Long id, Integer quantity) {
@@ -133,11 +100,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public void delete(Long id) {
-        Product product = getById(id);
-        for (ProductAttribute attribute : product.getAttributes()) {
-            attributeService.deleteAttribute(attribute);
-        }
+    public void delete(Product product) {
         productRepository.delete(product);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAll() {
+        productRepository.deleteAllInBatch();
     }
 }

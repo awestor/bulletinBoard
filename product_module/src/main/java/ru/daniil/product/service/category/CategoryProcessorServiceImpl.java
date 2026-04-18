@@ -30,8 +30,6 @@ public class CategoryProcessorServiceImpl implements CategoryProcessorService {
     }
 
     private void transferChildrenAndProducts(Category category, Category newCategory) {
-
-
         if (!category.isLeaf()) {
             categoryService.updateParentForCategories(category, newCategory);
         } else if (!category.getProducts().isEmpty()) {

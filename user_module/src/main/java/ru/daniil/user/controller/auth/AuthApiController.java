@@ -10,12 +10,15 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.daniil.core.enums.CookieType;
 import ru.daniil.core.request.auth.LoginRequest;
 import ru.daniil.core.request.auth.RegistrationRequest;
 import ru.daniil.core.response.MessageResponse;
 import ru.daniil.core.response.auth.JwtResponse;
-import ru.daniil.core.enums.AuthProvider;
 import ru.daniil.user.service.auth.AuthenticationService;
 
 import java.util.Arrays;
@@ -41,9 +44,7 @@ public class AuthApiController {
         String provider = payload.get("provider");
 
         try {
-            System.err.println("Пользователь обратился с токеном");
             JwtResponse jwtResponse = authenticationService.authByToken(code, provider, response);
-            System.err.println("Токен был обработан");
             return ResponseEntity.ok(jwtResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -135,11 +136,13 @@ public class AuthApiController {
 
     /**
      * Получение refresh токена из cookie
+     * @param request HttpServletRequest переменная
+     * @return refresh токен
      */
     private String getRefreshTokenFromCookie(HttpServletRequest request) {
         if (request.getCookies() != null) {
             return Arrays.stream(request.getCookies())
-                    .filter(cookie -> "refresh_token".equals(cookie.getName()))
+                    .filter(cookie -> CookieType.REFRESH_TOKEN.toString().equals(cookie.getName()))
                     .map(Cookie::getValue)
                     .findFirst()
                     .orElse(null);

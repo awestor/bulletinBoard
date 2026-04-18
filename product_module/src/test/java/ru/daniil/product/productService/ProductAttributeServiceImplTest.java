@@ -1,4 +1,4 @@
-package ru.daniil.product.service;
+package ru.daniil.product.productService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
