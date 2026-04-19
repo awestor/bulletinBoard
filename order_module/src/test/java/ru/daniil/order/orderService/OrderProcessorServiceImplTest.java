@@ -22,7 +22,6 @@ import ru.daniil.order.service.order.OrderProcessorServiceImpl;
 import ru.daniil.order.service.order.OrderService;
 import ru.daniil.order.service.orderItem.OrderItemService;
 import ru.daniil.product.service.product.ProductService;
-import ru.daniil.user.service.user.UserService;
 
 import java.math.BigDecimal;
 import java.util.*;

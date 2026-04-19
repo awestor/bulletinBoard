@@ -16,7 +16,7 @@ import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.AuthProvider;
 import ru.daniil.core.enums.CategoryType;
 import ru.daniil.core.exceptions.UserBlockedExeption;
-import ru.daniil.core.request.CreateProductRequest;
+import ru.daniil.core.request.CreateUpdateProductRequest;
 import ru.daniil.image.service.product.ProductImageService;
 import ru.daniil.product.service.attribute.ProductAttributeService;
 import ru.daniil.product.service.category.CategoryService;
@@ -52,7 +52,7 @@ class ProductProcessorServiceImplTest {
     private Category leafCategory;
     private Category nonLeafCategory;
     private Product product;
-    private CreateProductRequest request;
+    private CreateUpdateProductRequest request;
     private User user;
 
     @BeforeEach
@@ -73,12 +73,12 @@ class ProductProcessorServiceImplTest {
         product.setStockQuantity(10);
         product.setDescription("Test Description");
 
-        request = new CreateProductRequest();
+        request = new CreateUpdateProductRequest();
         request.setName("New Product");
         request.setPrice(new BigDecimal("150.00"));
         request.setDescription("New Description");
         request.setStockQuantity(5);
-        request.setCategoryId(1L);
+        request.setCategoryName(leafCategory.getName());
 
         Map<String, String> attributes = new HashMap<>();
         attributes.put("color", "red");
@@ -91,7 +91,7 @@ class ProductProcessorServiceImplTest {
 
     @Test
     void create_WithValidData_ShouldCreateProduct() throws IOException {
-        when(categoryService.getById(1L)).thenReturn(leafCategory);
+        when(categoryService.getByName(any())).thenReturn(leafCategory);
         when(productService.generateSku()).thenReturn("NEWSKU123456");
         when(productService.save(any(Product.class))).thenAnswer(i -> i.getArgument(0));
         when(attributeService.saveMany(any(Product.class), anyMap())).thenReturn(new HashSet<>());
@@ -124,8 +124,8 @@ class ProductProcessorServiceImplTest {
 
     @Test
     void create_WhenCategoryNotLeaf_ShouldThrowException() {
-        when(categoryService.getById(2L)).thenReturn(nonLeafCategory);
-        request.setCategoryId(2L);
+        request.setCategoryName(nonLeafCategory.getName());
+        when(categoryService.getByName(any())).thenReturn(nonLeafCategory);
 
         BadRequestException exception = assertThrows(BadRequestException.class,
                 () -> productProcessorService.create(request, user));
@@ -137,7 +137,7 @@ class ProductProcessorServiceImplTest {
     @Test
     void create_WithoutAttributes_ShouldCreateWithoutAttributes() throws IOException {
         request.setAttributes(null);
-        when(categoryService.getById(1L)).thenReturn(leafCategory);
+        when(categoryService.getByName(any())).thenReturn(leafCategory);
         when(productService.generateSku()).thenReturn("NEWSKU123456");
         when(productService.save(any(Product.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -150,10 +150,10 @@ class ProductProcessorServiceImplTest {
     @Test
     void create_WithoutImages_ShouldCreateWithoutImages() throws IOException {
         request.setImages(null);
-        when(categoryService.getById(1L)).thenReturn(leafCategory);
         when(productService.generateSku()).thenReturn("NEWSKU123456");
         when(productService.save(any(Product.class))).thenAnswer(i -> i.getArgument(0));
         when(attributeService.saveMany(any(Product.class), anyMap())).thenReturn(new HashSet<>());
+        when(categoryService.getByName(any())).thenReturn(leafCategory);
 
         Product result = productProcessorService.create(request, user);
 
@@ -164,7 +164,7 @@ class ProductProcessorServiceImplTest {
 
     @Test
     void create_WhenImageSaveFails_ShouldThrowException() {
-        when(categoryService.getById(1L)).thenReturn(leafCategory);
+        when(categoryService.getByName(leafCategory.getName())).thenReturn(leafCategory);
         when(productService.generateSku()).thenReturn("NEWSKU123456");
         when(productService.save(any(Product.class))).thenAnswer(i -> i.getArgument(0));
         when(productImageService.saveImage(any(MultipartFile.class))).thenThrow(new RuntimeException("Ошибка сохранения изображения"));
@@ -180,13 +180,14 @@ class ProductProcessorServiceImplTest {
     void update_WithNewCategory_ShouldUpdateAllFields() {
         Category newCategory = new Category("New Leaf", CategoryType.LEAF);
         newCategory.setId(3L);
-        request.setCategoryId(3L);
+        request.setCategoryName(newCategory.getName());
 
+        when(categoryService.getByName(any())).thenReturn(newCategory);
         when(productService.getById(1L)).thenReturn(product);
         when(productService.save(any(Product.class))).thenReturn(product);
         when(attributeService.setMany(any(Product.class), anyMap())).thenReturn(new HashSet<>());
 
-        Product result = productProcessorService.update(1L, request, newCategory);
+        Product result = productProcessorService.update(1L, request);
 
         assertEquals("New Product", result.getName());
         assertEquals(new BigDecimal("150.00"), result.getPrice());
@@ -196,11 +197,12 @@ class ProductProcessorServiceImplTest {
 
     @Test
     void update_WhenNewCategoryNotLeaf_ShouldThrowException() {
-        request.setCategoryId(2L);
+        request.setCategoryName(nonLeafCategory.getName());
         when(productService.getById(1L)).thenReturn(product);
+        when(categoryService.getByName(nonLeafCategory.getName())).thenReturn(nonLeafCategory);
 
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> productProcessorService.update(1L, request, nonLeafCategory));
+                () -> productProcessorService.update(1L, request));
 
         assertEquals("Продукт не может быть назначен в не конечную категорию", exception.getMessage());
         verify(productService, never()).save(any());
@@ -212,7 +214,7 @@ class ProductProcessorServiceImplTest {
         when(productService.save(any(Product.class))).thenReturn(product);
         when(attributeService.setMany(any(Product.class), anyMap())).thenReturn(new HashSet<>());
 
-        Product result = productProcessorService.update(1L, request, leafCategory);
+        Product result = productProcessorService.update(1L, request);
 
         assertEquals("New Product", result.getName());
         assertEquals(leafCategory, result.getCategory());
@@ -224,7 +226,7 @@ class ProductProcessorServiceImplTest {
         when(productService.getById(1L)).thenThrow(new NotFoundException("Продукт не найден"));
 
         NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> productProcessorService.update(1L, request, leafCategory));
+                () -> productProcessorService.update(1L, request));
 
         assertEquals("Продукт для редактирования не был найден", exception.getMessage());
         verify(productService, never()).save(any());

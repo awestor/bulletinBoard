@@ -32,5 +32,4 @@ public class ProductAttribute {
         this.key = key;
         this.value = value;
     }
-
 }

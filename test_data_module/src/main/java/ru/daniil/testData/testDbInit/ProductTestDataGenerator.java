@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.Category;
 import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.request.CreateProductRequest;
+import ru.daniil.core.request.CreateUpdateProductRequest;
 import ru.daniil.product.service.category.CategoryService;
 import ru.daniil.product.service.product.ProductProcessorService;
 import ru.daniil.product.service.product.ProductService;
@@ -181,11 +181,11 @@ public class ProductTestDataGenerator {
     private List<Product> createProductsForCategory(Category category, User seller, int count) {
         List<Product> products = new ArrayList<>();
 
-        List<CreateProductRequest> templates = getProductTemplatesForCategory(category.getName(), category);
+        List<CreateUpdateProductRequest> templates = getProductTemplatesForCategory(category.getName(), category);
 
         try {
             for (int i = 0; i < count; i++) {
-                CreateProductRequest template = templates.isEmpty()
+                CreateUpdateProductRequest template = templates.isEmpty()
                         ? getDefaultTemplate(category)
                         : templates.get(i % templates.size());
 
@@ -219,7 +219,7 @@ public class ProductTestDataGenerator {
         return products;
     }
 
-    private String generateProductName(CreateProductRequest template, int index) {
+    private String generateProductName(CreateUpdateProductRequest template, int index) {
         List<String> modifiers = Arrays.asList("Профессиональный", "Базовый", "Премиум", "Эконом", "Ультра");
         String modifier = modifiers.get(index % modifiers.size());
         return modifier + " " + template.getName() + (index > 0 ? " " + (index + 1) : "");
@@ -239,8 +239,8 @@ public class ProductTestDataGenerator {
         return 5 + (hash % 11);
     }
 
-    private List<CreateProductRequest> getProductTemplatesForCategory(String categoryName, Category category) {
-        List<CreateProductRequest> templates = new ArrayList<>();
+    private List<CreateUpdateProductRequest> getProductTemplatesForCategory(String categoryName, Category category) {
+        List<CreateUpdateProductRequest> templates = new ArrayList<>();
 
         // Электроника
         switch (categoryName) {
@@ -375,8 +375,8 @@ public class ProductTestDataGenerator {
      * @param description описание
      * @return CreateProductRequest
      */
-    private CreateProductRequest createProductRequest(Category category, String name, int price, String description) {
-        return CreateProductRequest.builder()
+    private CreateUpdateProductRequest createProductRequest(Category category, String name, int price, String description) {
+        return CreateUpdateProductRequest.builder()
                 .name(name)
                 .description(description)
                 .price(BigDecimal.valueOf(price))
@@ -387,7 +387,7 @@ public class ProductTestDataGenerator {
                 .build();
     }
 
-    private CreateProductRequest getDefaultTemplate(Category category) {
+    private CreateUpdateProductRequest getDefaultTemplate(Category category) {
         return createProductRequest(
                 category, "Стандартный товар",
                 1500, "Базовый товар для тестирования"

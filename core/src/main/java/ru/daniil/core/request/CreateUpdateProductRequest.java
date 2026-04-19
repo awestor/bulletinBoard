@@ -13,7 +13,7 @@ import java.util.Map;
 @Data
 @Builder
 @AllArgsConstructor
-public class CreateProductRequest {
+public class CreateUpdateProductRequest {
     @NotBlank(message = "Название товара обязательно для заполнения")
     @Size(min = 3, max = 200, message = "Название товара должно содержать от 3 до 200 символов")
     private String name;
@@ -26,9 +26,9 @@ public class CreateProductRequest {
     @DecimalMax(value = "9999999.99", message = "Цена товара не может превышать 9 999 999.99")
     private BigDecimal price;
 
-    @NotNull(message = "Категория товара обязательна для заполнения")
-    @Min(value = 1, message = "ID категории должен быть положительным числом")
-    private Long categoryId;
+    @NotBlank(message = "Категория товара обязательна для заполнения")
+    @Size(min = 3, max = 200, message = "Название категории должно содержать от 3 до 200 символов")
+    private String categoryName;
 
     @NotNull(message = "Количество на складе обязательно для заполнения")
     @Min(value = 0, message = "Количество на складе не может быть отрицательным")
@@ -39,6 +39,6 @@ public class CreateProductRequest {
 
     private Map<String, String> attributes;
 
-    public CreateProductRequest() {
+    public CreateUpdateProductRequest() {
     }
 }

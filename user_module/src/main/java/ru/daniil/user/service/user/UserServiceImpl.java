@@ -4,11 +4,14 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.AuthProvider;
@@ -81,14 +84,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getAuthUser(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationToken authentication = (JwtAuthenticationToken)
+                SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated()
-                || "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new AuthenticationException("Пользователь не авторизован") {};
-        }
+        assert authentication != null;
+        Jwt jwt = authentication.getToken();
+        String email = jwt.getClaimAsString("email");
 
-        return (User) authentication.getPrincipal();
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new BadCredentialsException("Пользователь не был аутентифицирован в системе")
+        );
     }
 
     @Override

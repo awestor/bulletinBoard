@@ -13,6 +13,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.daniil.core.entity.base.user.User;
+import ru.daniil.core.enums.CookieType;
 import ru.daniil.core.response.auth.JwtResponse;
 import ru.daniil.user.service.auth.KeycloakServiceImpl;
 
@@ -98,12 +99,12 @@ class KeycloakServiceImplTest {
         verify(response).addCookie(cookieCaptor.capture());
 
         Cookie cookie = cookieCaptor.getValue();
-        assertEquals("refresh_token", cookie.getName());
+        assertEquals(CookieType.REFRESH_TOKEN.toString(), cookie.getName());
         assertEquals("refresh-token-123", cookie.getValue());
         assertTrue(cookie.isHttpOnly());
         assertTrue(cookie.getSecure());
         assertEquals("/", cookie.getPath());
-        assertEquals(30 * 24 * 60 * 60, cookie.getMaxAge());
+        assertEquals(60 * 60, cookie.getMaxAge());
         assertEquals("Strict", cookie.getAttribute("SameSite"));
     }
 
@@ -300,7 +301,7 @@ class KeycloakServiceImplTest {
         verify(response).addCookie(cookieCaptor.capture());
 
         Cookie cookie = cookieCaptor.getValue();
-        assertEquals("refresh_token", cookie.getName());
+        assertEquals(CookieType.REFRESH_TOKEN.toString(), cookie.getName());
         assertEquals("new-refresh-token", cookie.getValue());
     }
 
@@ -353,7 +354,7 @@ class KeycloakServiceImplTest {
         verify(response).addCookie(cookieCaptor.capture());
 
         Cookie cookie = cookieCaptor.getValue();
-        assertEquals("refresh_token", cookie.getName());
+        assertEquals(CookieType.REFRESH_TOKEN.toString(), cookie.getName());
         assertEquals(0, cookie.getMaxAge());
         assertNull(cookie.getValue());
     }
@@ -378,7 +379,7 @@ class KeycloakServiceImplTest {
         verify(response).addCookie(cookieCaptor.capture());
 
         Cookie cookie = cookieCaptor.getValue();
-        assertEquals("refresh_token", cookie.getName());
+        assertEquals(CookieType.REFRESH_TOKEN.toString(), cookie.getName());
         assertEquals(0, cookie.getMaxAge());
         assertNull(cookie.getValue());
     }

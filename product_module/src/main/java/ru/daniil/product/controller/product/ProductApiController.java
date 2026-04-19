@@ -24,7 +24,7 @@ import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.exceptions.UserBlockedExeption;
 import ru.daniil.product.mapper.ProductMapper;
-import ru.daniil.core.request.CreateProductRequest;
+import ru.daniil.core.request.CreateUpdateProductRequest;
 import ru.daniil.core.response.product.ProductFilterRequest;
 import ru.daniil.core.response.product.ProductResponse;
 import ru.daniil.core.sharedInterfaces.UserProvider;
@@ -83,7 +83,7 @@ public class ProductApiController {
             )
     })
     public ResponseEntity<Map<String, Object>> generateTestProducts(
-            @Valid @RequestBody CreateProductRequest request) {
+            @Valid @RequestBody CreateUpdateProductRequest request) {
         JwtAuthenticationToken authentication = (JwtAuthenticationToken)
                 SecurityContextHolder.getContext().getAuthentication();
 
@@ -276,5 +276,131 @@ public class ProductApiController {
         response.put("filtersApplied", filter);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(
+            summary = "Обновление продукта",
+            description = "Обновляет существующий продукт по его ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Продукт успешно обновлён",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Некорректные данные запроса",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Пользователю заблокирована возможность редактирования товаров",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Продукт не найден или не принадлежит текущему пользователю",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Внутренняя ошибка сервера",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<Map<String, Object>> updateProduct(
+            @Parameter(description = "ID продукта", required = true)
+            @PathVariable Long id,
+            @Valid @RequestBody CreateUpdateProductRequest request) {
+
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User currentUser = userProvider.getAuthUser();
+
+            if (currentUser.isTradingBlocked()) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Пользователю заблокирована возможность работы с товарами"));
+            }
+
+            Product product = productService.getById(id);
+
+            if (!product.getSeller().getId().equals(currentUser.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Изменять можно только свои товары"));
+            }
+
+            Product updatedProduct = productProcessorService.update(id, request);
+
+            response.put("message", "Продукт успешно обновлён");
+            response.put("product", productMapper.toResponse(updatedProduct));
+            return ResponseEntity.ok(response);
+
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Продукт не найден"));
+        } catch (BadRequestException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Ошибка при обновлении продукта: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{sku}")
+    @Operation(
+            summary = "Удаление продукта",
+            description = "Удаляет продукт по его ID (только свои продукты)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Продукт успешно удалён",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Попытка удалить чужой продукт",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Продукт не найден",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Внутренняя ошибка сервера",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<Map<String, Object>> deleteProduct(
+            @Parameter(description = "ID продукта", required = true)
+            @PathVariable String sku) {
+
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User currentUser = userProvider.getAuthUser();
+            Product product = productService.getBySku(sku);
+
+            if (!product.getSeller().getId().equals(currentUser.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Вы можете удалять только свои товары"));
+            }
+
+            productProcessorService.delete(product.getId());
+
+            response.put("message", "Продукт успешно удалён");
+            return ResponseEntity.ok(response);
+
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Продукт не найден"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Ошибка при удалении продукта: " + e.getMessage()));
+        }
     }
 }

@@ -6,6 +6,12 @@ import java.util.Optional;
 
 public interface UserProvider {
     /**
+     * Возвращает авторизованного пользователя или exception.
+     * Требует работу через JWT авторизацию, что в JWT будет храниться email пользователя
+     * @return Пользователь или BadCredentialsException
+     */
+    User getAuthUser();
+    /**
      * Возвращает пользователя по его логину
      * @param login логин пользователя
      * @return Пользователь или null

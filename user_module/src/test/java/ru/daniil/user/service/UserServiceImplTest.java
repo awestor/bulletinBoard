@@ -9,16 +9,21 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.AuthProvider;
 import ru.daniil.core.request.auth.RegistrationRequest;
 import ru.daniil.user.repository.UserRepository;
 import ru.daniil.user.service.user.UserServiceImpl;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -157,56 +162,48 @@ class UserServiceImplTest {
 
     @Test
     void getAuthUser_WhenAuthenticated_ShouldReturnUser() {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
+        Jwt jwt = mock(Jwt.class);
+        when(jwt.getClaimAsString("email")).thenReturn(user.getEmail());
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getPrincipal()).thenReturn(user);
+        JwtAuthenticationToken authentication = mock(JwtAuthenticationToken.class);
+        when(authentication.getToken()).thenReturn(jwt);
 
-        SecurityContextHolder.setContext(securityContext);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        when(userService.getByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         User result = userService.getAuthUser();
 
-        assertEquals(user, result);
-    }
-
-    @Test
-    void getAuthUser_WhenNotAuthenticated_ShouldThrowException() {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.isAuthenticated()).thenReturn(false);
-
-        SecurityContextHolder.setContext(securityContext);
-
-        assertThrows(RuntimeException.class, () -> userService.getAuthUser());
+        assertNotNull(result);
+        assertEquals(user.getEmail(), result.getEmail());
+        assertEquals(1L, result.getId());
+        assertEquals("testuser", result.getLogin());
     }
 
     @Test
     void getAuthUser_WhenAnonymous_ShouldThrowException() {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
+        AnonymousAuthenticationToken anonymousToken = new AnonymousAuthenticationToken(
+                "anonymousKey",
+                "anonymousUser",
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))
+        );
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getPrincipal()).thenReturn("anonymousUser");
+        SecurityContextHolder.getContext().setAuthentication(anonymousToken);
 
-        SecurityContextHolder.setContext(securityContext);
-
-        assertThrows(RuntimeException.class, () -> userService.getAuthUser());
+        assertThrows(ClassCastException.class, () -> {
+            userService.getAuthUser();
+        });
     }
 
     @Test
     void getAuthUser_WhenAuthenticationNull_ShouldThrowException() {
-        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.getContext().setAuthentication(null);
 
-        when(securityContext.getAuthentication()).thenReturn(null);
+        Throwable exception = assertThrows(Throwable.class, () -> {
+            userService.getAuthUser();
+        });
 
-        SecurityContextHolder.setContext(securityContext);
-
-        assertThrows(RuntimeException.class, () -> userService.getAuthUser());
+        assertInstanceOf(AssertionError.class, exception);
     }
 
     @Test

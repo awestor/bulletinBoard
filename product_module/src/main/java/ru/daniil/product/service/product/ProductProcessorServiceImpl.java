@@ -4,8 +4,6 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,8 +13,7 @@ import ru.daniil.core.entity.base.product.ProductAttribute;
 import ru.daniil.core.entity.base.product.ProductImage;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.exceptions.UserBlockedExeption;
-import ru.daniil.core.request.CreateProductRequest;
-import ru.daniil.core.response.product.ProductFilterRequest;
+import ru.daniil.core.request.CreateUpdateProductRequest;
 import ru.daniil.image.service.product.ProductImageService;
 import ru.daniil.product.service.attribute.ProductAttributeService;
 import ru.daniil.product.service.category.CategoryService;
@@ -43,12 +40,12 @@ public class ProductProcessorServiceImpl implements ProductProcessorService {
 
     @Transactional
     @Override
-    public Product create(CreateProductRequest request, User user) {
+    public Product create(CreateUpdateProductRequest request, User user) {
         if (user.isTradingBlocked()) {
             throw new UserBlockedExeption("Пользователю запрещено выставлять объявления о продаже");
         }
 
-        Category category =  categoryService.getById(request.getCategoryId());
+        Category category =  categoryService.getByName(request.getCategoryName());
         if (!category.isLeaf()) {
             throw new BadRequestException("Продукт не может быть размещён в не конечной категории");
         }
@@ -97,17 +94,17 @@ public class ProductProcessorServiceImpl implements ProductProcessorService {
 
     @Transactional
     @Override
-    public Product update(Long id, CreateProductRequest request, Category newCategory) {
+    public Product update(Long id, CreateUpdateProductRequest request) {
         Product product;
         try{
             product = productService.getById(id);
-            if (request.getCategoryId() != null && !request.getCategoryId()
-                    .equals(product.getCategory().getId())) {
+            if (!request.getCategoryName().equals(product.getCategory().getName())) {
+
+                Category newCategory = categoryService.getByName(request.getCategoryName());
 
                 if (!newCategory.isLeaf()) {
                     throw new BadRequestException("Продукт не может быть назначен в не конечную категорию");
                 }
-
                 product.setCategory(newCategory);
             }
 
