@@ -1,4 +1,4 @@
-package ru.daniil.order.service;
+package ru.daniil.order.orderService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

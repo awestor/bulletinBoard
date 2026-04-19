@@ -15,6 +15,11 @@ import java.util.List;
 public interface OrderItemRepository extends CrudRepository<OrderItem, Long> {
     List<OrderItem> findByOrder_OrderNumber(String orderNumber);
 
+    @Query("SELECT oi FROM OrderItem oi " +
+            "JOIN FETCH oi.product " +
+            "WHERE oi.order.orderNumber = :orderNumber")
+    List<OrderItem> findByOrderNumberWithProduct(@Param("orderNumber") String orderNumber);
+
     @Modifying
     @Query("UPDATE OrderItem oi SET oi.quantity = :quantity, oi.reservedUntil = :reservedUntil WHERE oi.id = :id")
     int updateQuantity(@Param("id") Long id,
@@ -24,4 +29,9 @@ public interface OrderItemRepository extends CrudRepository<OrderItem, Long> {
     @Modifying
     @Query("UPDATE OrderItem oi SET oi.priceAtTime = :priceAtTime WHERE oi.id = :id")
     int updatePrice(@Param("id") Long id, @Param("priceAtTime") BigDecimal priceAtTime);
+
+    @Query("SELECT COALESCE(SUM(oi.quantity), 0) FROM OrderItem oi " +
+            "WHERE oi.product.sku = :sku AND oi.reservedUntil > :now")
+    Integer getTotalReservedQuantityByProductSku(@Param("sku") String sku,
+                                                 @Param("now") LocalDateTime now);
 }

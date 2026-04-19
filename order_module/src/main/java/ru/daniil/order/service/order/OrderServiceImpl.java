@@ -10,7 +10,6 @@ import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.OrderStatus;
 import ru.daniil.order.repository.order.OrderRepository;
 
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -75,6 +74,11 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public void updateTotalPrice(Order order){
         orderRepository.updateTotalPrice(order.getId(), order.getTotalPrice());
+    }
+
+    @Override
+    public void updateStatus(Long orderId, OrderStatus status) {
+        orderRepository.updateStatus(orderId, status);
     }
 
     @Transactional

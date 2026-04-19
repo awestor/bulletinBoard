@@ -19,7 +19,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/test/users")
 @Tag(name = "Управление тестовыми пользователями",
-        description = "Endpoints для генерации и управления тестовыми пользователями-продавцами")
+        description = "API для генерации и управления тестовыми пользователями-продавцами")
 public class UserTestDataController {
 
     private static final Logger infoLogger = LoggerFactory.getLogger("INFO-LOGGER");

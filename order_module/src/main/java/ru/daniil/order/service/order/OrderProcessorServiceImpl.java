@@ -9,12 +9,11 @@ import ru.daniil.core.entity.base.order.Order;
 import ru.daniil.core.entity.base.order.OrderItem;
 import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.request.CreateOrderItemRequest;
-import ru.daniil.core.request.DeleteOrderItemRequest;
+import ru.daniil.core.request.orderItem.CreateOrderItemRequest;
+import ru.daniil.core.request.orderItem.DeleteOrderItemRequest;
+import ru.daniil.core.request.orderItem.ReduceQuantityRequest;
 import ru.daniil.order.service.orderItem.OrderItemService;
 import ru.daniil.product.service.product.ProductService;
-import ru.daniil.user.service.user.UserService;
-
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,15 +24,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderProcessorServiceImpl implements OrderProcessorService {
-    private final UserService userService;
     private final OrderService orderService;
     private final OrderItemService orderItemService;
     private final ProductService productService;
 
-    public OrderProcessorServiceImpl(UserService userService, OrderService orderService,
+    public OrderProcessorServiceImpl(OrderService orderService,
                                      OrderItemService orderItemService,
                                      ProductService productService) {
-        this.userService = userService;
         this.orderService = orderService;
         this.orderItemService = orderItemService;
         this.productService = productService;
@@ -41,12 +38,12 @@ public class OrderProcessorServiceImpl implements OrderProcessorService {
 
     @Transactional
     @Override
-    public OrderItem addOrderItem(CreateOrderItemRequest request) {
-        User user = userService.getAuthUser();
+    public OrderItem addOrderItem(CreateOrderItemRequest request, User user) {
         Order order = orderService.getLastOrCreateOrderByUser(user);
         Product product = productService.getBySku(request.getSku());
+        Integer reservationCount = orderItemService.countReservation(request.getSku());
 
-        if (product.getStockQuantity() >= request.getQuantity()){
+        if (product.getStockQuantity() >= (request.getQuantity() + reservationCount)){
             Optional<OrderItem> existingItem = itemExist(order, request.getSku());
 
             OrderItem item;
@@ -66,14 +63,31 @@ public class OrderProcessorServiceImpl implements OrderProcessorService {
 
     @Transactional
     @Override
-    public void removeOrderItem(DeleteOrderItemRequest request) {
-        User user = userService.getAuthUser();
+    public void removeOrderItem(DeleteOrderItemRequest request, User user) {
         Order order = orderService.getLastOrCreateOrderByUser(user);
 
         Optional<OrderItem> existingItem = itemExist(order, request.getSku());
 
         if (existingItem.isPresent()){
             orderItemService.delete(existingItem.get().getId());
+            recalculateTotals(order);
+        }
+        else {
+            throw new EntityNotFoundException("Заказанный предмет с указанным номером не найден");
+        }
+    }
+
+    @Transactional
+    @Override
+    public void reduceQuantityOrderItem(ReduceQuantityRequest request, User user) {
+        Order order = orderService.getLastOrCreateOrderByUser(user);
+
+        Optional<OrderItem> existingItem = itemExist(order, request.getSku());
+
+        if (existingItem.isPresent()){
+            OrderItem item = existingItem.get();
+            item.setQuantity(item.getQuantity() - request.getQuantity());
+            orderItemService.updateItemQuantity(item);
             recalculateTotals(order);
         }
         else {

@@ -8,14 +8,11 @@ import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.response.product.ProductFilterRequest;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProductService {
 
     Product save(Product product);
-
-    //Product create(CreateProductRequest request, Category category);
-
-    //Product update(Long id, CreateProductRequest request, Category newCategory);
 
     Product getById(Long id);
 
@@ -30,6 +27,19 @@ public interface ProductService {
     Page<Product> filterProducts(ProductFilterRequest filter, Pageable pageable);
 
     long count();
+
+    /**
+     * Обновление остатков нескольких товаров
+     * @param skuQuantityMap мапа SKU + количество для списания для каждого продукта
+     * @throws IllegalArgumentException если для какого-то товара недостаточно остатка
+     */
+    void decreaseStockQuantities(Map<String, Integer> skuQuantityMap);
+
+    /**
+     * Восстановление остатков нескольких товаров (при отмене оплаты)
+     * @param skuQuantityMap мапа SKU + количество для восстановления для каждого продукта
+     */
+    void increaseStockQuantities(Map<String, Integer> skuQuantityMap);
 
     void updateStock(Long id, Integer quantity);
 

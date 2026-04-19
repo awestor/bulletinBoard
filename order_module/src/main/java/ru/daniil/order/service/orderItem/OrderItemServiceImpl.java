@@ -8,7 +8,7 @@ import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.order.repository.order.OrderItemRepository;
 
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -58,7 +58,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public boolean validateAvailability(Order order){
-        List<OrderItem> orderItems = orderItemRepository.findByOrder_OrderNumber(order.getOrderNumber());
+        List<OrderItem> orderItems = orderItemRepository.findByOrderNumberWithProduct(order.getOrderNumber());
 
         return orderItems.stream()
                 .allMatch(item -> item.getProduct().getStockQuantity() >= item.getQuantity());
@@ -68,5 +68,10 @@ public class OrderItemServiceImpl implements OrderItemService {
     public void delete(Long orderItemId) {
         OrderItem item = getById(orderItemId);
         orderItemRepository.delete(item);
+    }
+
+    @Override
+    public Integer countReservation(String sku){
+        return orderItemRepository.getTotalReservedQuantityByProductSku(sku, LocalDateTime.now());
     }
 }

@@ -93,4 +93,6 @@ public interface ProductRepository extends CrudRepository<Product, Long>, JpaSpe
     void deleteAllInBatch();
 
     Page<Product> findAll(Pageable pageable);
+
+    List<Product> findBySkuIn(List<String> skus);
 }

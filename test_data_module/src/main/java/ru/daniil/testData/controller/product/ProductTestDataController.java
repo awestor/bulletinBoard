@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/test/product")
 @Tag(name = "Управление тестовыми продуктами",
-        description = "Endpoints для генерации и управления тестовыми данными продуктов")
+        description = "API для генерации и управления тестовыми данными продуктов")
 public class ProductTestDataController {
 
     private final ProductTestDataGenerator productTestDataGenerator;

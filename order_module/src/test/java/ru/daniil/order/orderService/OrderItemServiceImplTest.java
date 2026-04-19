@@ -1,4 +1,4 @@
-package ru.daniil.order.service;
+package ru.daniil.order.orderService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -136,7 +136,7 @@ class OrderItemServiceImplTest {
     @Test
     void validateAvailability_WhenAllItemsAvailable_ShouldReturnTrue() {
         List<OrderItem> items = Collections.singletonList(orderItem);
-        when(orderItemRepository.findByOrder_OrderNumber("ORD-123")).thenReturn(items);
+        when(orderItemRepository.findByOrderNumberWithProduct("ORD-123")).thenReturn(items);
         product.setStockQuantity(5);
 
         boolean result = orderItemService.validateAvailability(order);
@@ -147,7 +147,7 @@ class OrderItemServiceImplTest {
     @Test
     void validateAvailability_WhenItemOutOfStock_ShouldReturnFalse() {
         List<OrderItem> items = Collections.singletonList(orderItem);
-        when(orderItemRepository.findByOrder_OrderNumber("ORD-123")).thenReturn(items);
+        when(orderItemRepository.findByOrderNumberWithProduct("ORD-123")).thenReturn(items);
         product.setStockQuantity(1);
 
         boolean result = orderItemService.validateAvailability(order);
@@ -166,7 +166,7 @@ class OrderItemServiceImplTest {
         item2.setQuantity(3);
 
         List<OrderItem> items = Arrays.asList(orderItem, item2);
-        when(orderItemRepository.findByOrder_OrderNumber("ORD-123")).thenReturn(items);
+        when(orderItemRepository.findByOrderNumberWithProduct("ORD-123")).thenReturn(items);
         product.setStockQuantity(5);
         product2.setStockQuantity(3);
 
@@ -186,7 +186,7 @@ class OrderItemServiceImplTest {
         item2.setQuantity(3);
 
         List<OrderItem> items = Arrays.asList(orderItem, item2);
-        when(orderItemRepository.findByOrder_OrderNumber("ORD-123")).thenReturn(items);
+        when(orderItemRepository.findByOrderNumberWithProduct("ORD-123")).thenReturn(items);
         product.setStockQuantity(5);
 
         boolean result = orderItemService.validateAvailability(order);

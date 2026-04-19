@@ -14,6 +14,8 @@ public interface OrderItemService {
 
     List<OrderItem> getByOrderNumber(String orderNumber);
 
+    Integer countReservation(String sku);
+
     void updateItemQuantity(OrderItem item);
 
     void updatePriceAtTime(OrderItem item);

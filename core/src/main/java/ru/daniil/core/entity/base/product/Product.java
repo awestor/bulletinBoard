@@ -1,4 +1,5 @@
 package ru.daniil.core.entity.base.product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,13 +56,15 @@ public class Product {
     private ProductStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false)  // ← НОВОЕ ПОЛЕ
+    @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<ProductImage> images;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<ProductAttribute> attributes;
 
     @Column(name = "created_at", updatable = false)

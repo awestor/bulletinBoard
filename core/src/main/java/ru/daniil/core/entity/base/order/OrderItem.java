@@ -1,5 +1,6 @@
 package ru.daniil.core.entity.base.order;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,10 +24,12 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonIgnore
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnore
     private Product product;
 
     @Column(nullable = false)
@@ -45,7 +48,6 @@ public class OrderItem {
         this.order = order;
         this.product = product;
         this.quantity = quantity;
-        this.reservedUntil = generateReservationTime();
     }
 
     public LocalDateTime generateReservationTime(){
@@ -63,8 +65,13 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
+    @PrePersist
+    protected void onCreate(){
+        this.reservedUntil = generateReservationTime();
+    }
+
     @PreUpdate
     protected void onUpdate() {
-        reservedUntil = LocalDateTime.now().plusMinutes(20);
+        reservedUntil = LocalDateTime.now().plusMinutes(2);
     }
 }

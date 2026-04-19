@@ -1,11 +1,14 @@
 package ru.daniil.core.entity.base.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.daniil.core.entity.base.product.Product;
+import ru.daniil.core.entity.base.wallet.Wallet;
 import ru.daniil.core.enums.AuthProvider;
 
 import java.time.LocalDate;
@@ -45,6 +48,14 @@ public class User implements UserDetails {
 
     @Column(name = "trading_blocked", nullable = false)
     private boolean tradingBlocked;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Product> products = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Wallet wallet;
 
     public User() {
         tradingBlocked = false;

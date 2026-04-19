@@ -5,7 +5,7 @@ import org.junit.platform.suite.api.Suite;
 import org.junit.platform.suite.api.SuiteDisplayName;
 
 @Suite
-@SuiteDisplayName("Tests сервисного слоя")
-@SelectPackages("ru.daniil.order.service")
+@SuiteDisplayName("Tests сервисного слоя заказов")
+@SelectPackages("ru.daniil.order.orderService")
 public class ServiceTestsSuite {
 }

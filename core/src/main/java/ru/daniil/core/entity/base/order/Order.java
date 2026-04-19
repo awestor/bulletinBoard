@@ -1,5 +1,6 @@
 package ru.daniil.core.entity.base.order;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @Column(nullable = false)
@@ -59,6 +61,7 @@ public class Order {
         this.status = OrderStatus.DRAFT;
         this.items = new ArrayList<>();
         this.appliedDiscounts = new ArrayList<>();
+        this.totalPrice = BigDecimal.ZERO;
     }
 
     public Order(User user) {

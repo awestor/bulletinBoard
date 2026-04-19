@@ -2,6 +2,7 @@ package ru.daniil.order.service.order;
 
 import ru.daniil.core.entity.base.order.Order;
 import ru.daniil.core.entity.base.user.User;
+import ru.daniil.core.enums.OrderStatus;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ public interface OrderService {
     Order getLastOrCreateOrderByUser(User user);
 
     void updateTotalPrice(Order order);
+
+    void updateStatus(Long orderId, OrderStatus status);
 
     List<Order> getByUser(User user);
 

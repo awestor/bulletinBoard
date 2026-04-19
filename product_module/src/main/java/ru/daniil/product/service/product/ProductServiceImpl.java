@@ -1,5 +1,6 @@
 package ru.daniil.product.service.product;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -12,7 +13,9 @@ import ru.daniil.product.repository.ProductRepository;
 import ru.daniil.product.service.attribute.ProductAttributeService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -83,6 +86,68 @@ public class ProductServiceImpl implements ProductService {
     public long count() {
         return productRepository.count();
     }
+
+    @Override
+    @Transactional
+    public void decreaseStockQuantities(Map<String, Integer> skuQuantityMap) {
+        List<String> skus = List.copyOf(skuQuantityMap.keySet());
+        List<Product> products = productRepository.findBySkuIn(skus);
+
+        if (products.size() != skus.size()) {
+            List<String> foundSkus = products.stream()
+                    .map(Product::getSku)
+                    .toList();
+            List<String> missingSkus = skus.stream()
+                    .filter(sku -> !foundSkus.contains(sku))
+                    .toList();
+            throw new EntityNotFoundException("Товары не найдены: " + missingSkus);
+        }
+
+        Map<String, Product> productMap = products.stream()
+                .collect(Collectors.toMap(Product::getSku, p -> p));
+
+        for (Map.Entry<String, Integer> entry : skuQuantityMap.entrySet()) {
+            String sku = entry.getKey();
+            Integer requestedQuantity = entry.getValue();
+            Product product = productMap.get(sku);
+
+            if (product.getStockQuantity() < requestedQuantity) {
+                throw new IllegalArgumentException(
+                        String.format("Недостаточно товара %s на складе. Доступно: %d, требуется: %d",
+                                sku, product.getStockQuantity(), requestedQuantity)
+                );
+            }
+        }
+
+        for (Map.Entry<String, Integer> entry : skuQuantityMap.entrySet()) {
+            String sku = entry.getKey();
+            Integer quantity = entry.getValue();
+            Product product = productMap.get(sku);
+            product.setStockQuantity(product.getStockQuantity() - quantity);
+            productRepository.save(product);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void increaseStockQuantities(Map<String, Integer> skuQuantityMap) {
+        List<String> skus = List.copyOf(skuQuantityMap.keySet());
+        List<Product> products = productRepository.findBySkuIn(skus);
+
+        Map<String, Product> productMap = products.stream()
+                .collect(Collectors.toMap(Product::getSku, p -> p));
+
+        for (Map.Entry<String, Integer> entry : skuQuantityMap.entrySet()) {
+            String sku = entry.getKey();
+            Integer quantity = entry.getValue();
+            Product product = productMap.get(sku);
+            if (product != null) {
+                product.setStockQuantity(product.getStockQuantity() + quantity);
+                productRepository.save(product);
+            }
+        }
+    }
+
 
     @Transactional
     @Override

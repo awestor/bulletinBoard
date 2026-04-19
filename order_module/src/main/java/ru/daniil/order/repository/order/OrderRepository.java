@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.daniil.core.entity.base.order.Order;
+import ru.daniil.core.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,7 +22,11 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
 
     @Modifying
     @Query("UPDATE Order o SET o.totalPrice = :totalPrice WHERE o.id = :id")
-    int updateTotalPrice(@Param("id") Long id, @Param("totalPrice") BigDecimal totalPrice);
+    void updateTotalPrice(@Param("id") Long id, @Param("totalPrice") BigDecimal totalPrice);
+
+    @Modifying
+    @Query("UPDATE Order o SET o.status = :status WHERE o.id = :id")
+    void updateStatus(@Param("id") Long id, @Param("status") OrderStatus status);
 
     List<Order> findByUserId(Long userId);
 }
