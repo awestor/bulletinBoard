@@ -13,16 +13,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentCompleteResponse {
-
     private String orderNumber;
-
     private Long transactionId;
-
     private BigDecimal totalPrice;
-
     private String status;
-
     private String message;
-
     private LocalDateTime completedAt;
 }

@@ -1,5 +1,6 @@
 keycloak:
-  auth-server-url: http://localhost:9090
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://docker.org:9090}
+  default-server-url: http://docker.org:9090
   realm: bulletin-board
   resource: bulletin-board-client
   credentials:
@@ -19,20 +20,19 @@ spring:
             client-secret: ${KEYCLOAK_CLIENT_SECRET}
             authorization-grant-type: authorization_code
             scope: openid,profile,email
-            #redirect-uri: "http://localhost:8080/test-auth"
             redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
         provider:
           keycloak:
-            issuer-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}
-            authorization-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/auth
-            token-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/token
-            user-info-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/userinfo
-            jwk-set-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/certs
+            issuer-uri: ${KEYCLOAK_EXTERNAL_URL:${keycloak.default-server-url}}/realms/${keycloak.realm}
+            authorization-uri: ${KEYCLOAK_EXTERNAL_URL:${keycloak.default-server-url}}/realms/${keycloak.realm}/protocol/openid-connect/auth
+            token-uri: ${KEYCLOAK_EXTERNAL_URL:${keycloak.default-server-url}}/realms/${keycloak.realm}/protocol/openid-connect/token
+            user-info-uri: ${KEYCLOAK_EXTERNAL_URL:${keycloak.default-server-url}}/realms/${keycloak.realm}/protocol/openid-connect/userinfo
+            jwk-set-uri: ${KEYCLOAK_EXTERNAL_URL:${keycloak.default-server-url}}/realms/${keycloak.realm}/protocol/openid-connect/certs
             user-name-attribute: preferred_username
 
       resourceserver:
         jwt:
-          issuer-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}
+          issuer-uri: ${KEYCLOAK_EXTERNAL_URL:${keycloak.default-server-url}}/realms/${keycloak.realm}
 
 # JWT Converter
 jwt:

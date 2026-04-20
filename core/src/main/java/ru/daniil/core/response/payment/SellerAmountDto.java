@@ -13,8 +13,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SellerAmountDto {
-
     private User seller;
-
     private BigDecimal amount;
 }

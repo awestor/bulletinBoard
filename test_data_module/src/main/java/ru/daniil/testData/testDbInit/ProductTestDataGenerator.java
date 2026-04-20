@@ -380,7 +380,7 @@ public class ProductTestDataGenerator {
                 .name(name)
                 .description(description)
                 .price(BigDecimal.valueOf(price))
-                .categoryId(category.getId())
+                .categoryName(category.getName())
                 .stockQuantity(generateRandomInt(10, 100))
                 .images(null)
                 .attributes(new HashMap<>())

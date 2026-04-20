@@ -7,6 +7,7 @@ spring:
 
   jpa:
     show-sql: true
+    open-in-view: true
     hibernate:
       ddl-auto: none
     properties:

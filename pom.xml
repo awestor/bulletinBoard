@@ -30,7 +30,8 @@
 		<module>order_module</module>
 		<module>test_data_module</module>
 		<module>app</module>
-    </modules>
+		<module>comment_module</module>
+	</modules>
 
 	<properties>
 		<java.version>21</java.version>
@@ -73,6 +74,16 @@
 			<dependency>
 				<groupId>ru.daniil</groupId>
 				<artifactId>order_module</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ru.daniil</groupId>
+				<artifactId>comment_module</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ru.daniil</groupId>
+				<artifactId>test_data_module</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

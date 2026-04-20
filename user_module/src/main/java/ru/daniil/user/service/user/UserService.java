@@ -32,4 +32,11 @@ public interface UserService extends UserProvider {
     User getAuthUser();
 
     String getUserAvatar(String username);
+
+    /**
+     * Получает пользователя по id оставленного им комментария
+     * @param commentId id комментария
+     * @return пользователь или NotFoundException
+     */
+    User getUserByCommentId(Long commentId);
 }

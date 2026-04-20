@@ -13,14 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentInitiateResponse {
-
     private String orderNumber;
-
     private BigDecimal totalPrice;
-
     private String status;
-
     private String message;
-
     private LocalDateTime createdAt;
 }

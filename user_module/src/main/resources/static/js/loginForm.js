@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const googleBtn = document.getElementById('googleLoginBtn');
         if (googleBtn) {
             googleBtn.addEventListener('click', () => {
-                window.location.href = 'http://localhost:9090/realms/bulletin-board/protocol/openid-connect/auth?client_id=bulletin-board-client&response_type=code&redirect_uri=http://localhost:8080/login&state=google&kc_idp_hint=google';
+                window.location.href = 'http://docker.org:9090/realms/bulletin-board/protocol/openid-connect/auth?client_id=bulletin-board-client&response_type=code&redirect_uri=http://localhost:8080/login&state=google&kc_idp_hint=google';
             });
         }
     })();

@@ -46,7 +46,8 @@ public class SpringSecurityConfig {
                                 "/js/**",
                                 "/images/**",
                                 "/test-auth",
-                                "/"
+                                "/",
+                                "/api/public/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/admin/**",
@@ -58,7 +59,7 @@ public class SpringSecurityConfig {
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter))
                 )
-                .formLogin(form -> form
+                /*.formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/", true)
@@ -71,7 +72,7 @@ public class SpringSecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
-                )
+                )*/
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )

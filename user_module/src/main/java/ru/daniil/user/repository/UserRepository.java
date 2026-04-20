@@ -30,6 +30,14 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByLogin(String login);
 
     /**
+     * Находит пользователя по id оставленного им комментария
+     * @param commentId id комментария
+     * @return найденный или нет пользователь
+     */
+    @Query("SELECT c.user FROM Comment c WHERE c.id = :commentId")
+    Optional<User> findUserByCommentId(@Param("commentId") Long commentId);
+
+    /**
      * Удаляет всех пользователей, чей логин начинается с указанного префикса
      * @param prefix префикс для поиска (например "generated-test-")
      * @return количество удалённых пользователей

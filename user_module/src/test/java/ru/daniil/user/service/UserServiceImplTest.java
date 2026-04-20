@@ -1,6 +1,7 @@
 package ru.daniil.user.service;
 
 import jakarta.validation.ValidationException;
+import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,8 @@ import ru.daniil.user.service.user.UserServiceImpl;
 import java.util.Collections;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -241,5 +244,26 @@ class UserServiceImplTest {
         Optional<User> result = userService.getByLogin("unknown");
 
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getUserByCommentId_Success() {
+        when(userRepository.findUserByCommentId(1L)).thenReturn(Optional.of(user));
+
+        User result = userService.getUserByCommentId(1L);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getLogin()).isEqualTo("testuser");
+        assertThat(result.getEmail()).isEqualTo("test@test.com");
+    }
+
+    @Test
+    void getUserByCommentId_CommentNotFound_ThrowsNotFoundException() {
+        when(userRepository.findUserByCommentId(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.getUserByCommentId(999L))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Пользователь по указанном id комментария не найден");
     }
 }

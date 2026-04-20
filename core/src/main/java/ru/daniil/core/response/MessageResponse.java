@@ -21,10 +21,4 @@ public class MessageResponse {
         this.message = message;
         this.timestamp = LocalDateTime.now();
     }
-
-    public MessageResponse(String message, Integer status) {
-        this.message = message;
-        this.status = status;
-        this.timestamp = LocalDateTime.now();
-    }
 }

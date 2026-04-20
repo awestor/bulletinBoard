@@ -109,6 +109,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByCommentId(Long commentId) {
+        return userRepository.findUserByCommentId(commentId).orElseThrow(
+                () -> new NotFoundException("Пользователь по указанном id комментария не найден")
+        );
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }

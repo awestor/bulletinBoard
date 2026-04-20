@@ -9,6 +9,6 @@ import org.springframework.core.annotation.Order;
 @ComponentScan(basePackages = "ru.daniil.testData")
 @EntityScan(basePackages = "ru.daniil.core.entity")
 @Order(6)
-public class testDataModuleConfig {
+public class TestDataModuleConfig {
     // Этот класс инициализирует компоненты test_data_module
 }
