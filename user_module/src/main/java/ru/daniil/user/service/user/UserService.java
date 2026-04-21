@@ -31,7 +31,12 @@ public interface UserService extends UserProvider {
      */
     User getAuthUser();
 
-    String getUserAvatar(String username);
+    /**
+     * Метод получения аватарки пользователя
+     * @param login login пользователя
+     * @return URL до его изображения или none, если нет такового
+     */
+    String getUserAvatar(String login);
 
     /**
      * Получает пользователя по id оставленного им комментария

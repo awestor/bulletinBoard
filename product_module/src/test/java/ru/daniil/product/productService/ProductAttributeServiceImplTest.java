@@ -6,15 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.product.ProductAttribute;
 import ru.daniil.product.repository.ProductAttributeRepository;
 import ru.daniil.product.service.attribute.ProductAttributeServiceImpl;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -179,5 +177,44 @@ class ProductAttributeServiceImplTest {
         attributeService.deleteAttributeByName("color");
 
         verify(productAttributeRepository).deleteAttributeForProducts("color");
+    }
+
+    @Test
+    void getMany_WhenAttributesExist_ShouldReturnPageOfAttributes() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("key").ascending());
+        Page<ProductAttribute> expectedPage = new PageImpl<>(List.of(attribute1, attribute2), pageable, 2);
+
+        when(productAttributeRepository.findByProduct(product, pageable)).thenReturn(expectedPage);
+
+        Page<ProductAttribute> result = attributeService.getMany(product, pageable);
+
+        assertNotNull(result);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(2, result.getContent().size());
+        assertEquals(0, result.getNumber());
+        assertEquals(10, result.getSize());
+        assertTrue(result.getContent().contains(attribute1));
+        assertTrue(result.getContent().contains(attribute2));
+
+        verify(productAttributeRepository).findByProduct(product, pageable);
+    }
+
+    @Test
+    void getMany_WhenNoAttributesExist_ShouldReturnEmptyPage() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ProductAttribute> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+
+        when(productAttributeRepository.findByProduct(product, pageable)).thenReturn(emptyPage);
+
+        Page<ProductAttribute> result = attributeService.getMany(product, pageable);
+
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements());
+        assertTrue(result.getContent().isEmpty());
+        assertEquals(0, result.getNumber());
+        assertEquals(10, result.getSize());
+        assertFalse(result.hasContent());
+
+        verify(productAttributeRepository).findByProduct(product, pageable);
     }
 }

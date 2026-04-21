@@ -16,7 +16,7 @@ import ru.daniil.product.service.category.CategoryService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/public/category")
 @Tag(name = "Api категорий", description = "API для работы с категориями")
 public class CategoryApiController {
     private final CategoryService categoryService;

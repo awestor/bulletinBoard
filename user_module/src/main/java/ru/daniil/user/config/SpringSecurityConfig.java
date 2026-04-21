@@ -47,7 +47,9 @@ public class SpringSecurityConfig {
                                 "/images/**",
                                 "/test-auth",
                                 "/",
-                                "/api/public/**"
+                                "/api/public/**",
+                                "/api/product-images/product/{sku}",
+                                "/api/attributes/{sku}/pducuctAttributes"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/admin/**",

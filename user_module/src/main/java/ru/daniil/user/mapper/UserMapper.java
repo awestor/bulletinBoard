@@ -11,10 +11,10 @@ import ru.daniil.core.response.auth.UserInfoResponse;
 public interface UserMapper {
 
     @Mapping(target = "id", source = "user.id")
-    @Mapping(target = "login", constant = "user.login")
-    @Mapping(target = "email", constant = "user.email")
-    @Mapping(target = "createdAt", constant = "user.createdAt")
-    @Mapping(target = "blockedUntil", constant = "user.blockedUntil")
+    @Mapping(target = "login", source  = "user.login")
+    @Mapping(target = "email", source  = "user.email")
+    @Mapping(target = "createdAt", source  = "user.createdAt")
+    @Mapping(target = "blockedUntil", source  = "user.blockedUntil")
     @Mapping(target = "tradingBlocked", source = "tradingBlocked")
     UserInfoResponse toUserInfoResponse (User user);
 }

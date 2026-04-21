@@ -31,7 +31,7 @@ function getDefaultAvatarSvg() {
 async function loadUserAvatar(username) {
     if (!username) return null;
     try {
-        const response = await fetch(`/api/user-images/avatar`, {
+        const response = await fetch(`/api/public/user-images/avatar`, {
             credentials: 'include'
         });
         if (response.ok) {

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.daniil.image.service.product.ProductImageService;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 @RestController

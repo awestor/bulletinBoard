@@ -1,9 +1,6 @@
 package ru.daniil.image.service.user;
 
 import org.springframework.web.multipart.MultipartFile;
-import ru.daniil.core.entity.base.user.User;
-
-import java.io.IOException;
 
 public interface UserImageService {
 

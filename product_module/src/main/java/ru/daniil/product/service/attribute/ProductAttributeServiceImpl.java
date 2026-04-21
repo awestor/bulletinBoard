@@ -1,6 +1,8 @@
 package ru.daniil.product.service.attribute;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.product.ProductAttribute;
@@ -18,6 +20,12 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
 
     public ProductAttributeServiceImpl(ProductAttributeRepository productAttributeRepository) {
         this.productAttributeRepository = productAttributeRepository;
+    }
+
+    @Override
+    @Transactional
+    public Page<ProductAttribute> getMany(Product product, Pageable pageable) {
+        return productAttributeRepository.findByProduct(product, pageable);
     }
 
     @Override

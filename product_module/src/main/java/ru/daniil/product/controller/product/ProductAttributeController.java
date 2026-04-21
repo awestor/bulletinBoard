@@ -7,11 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.product.ProductAttribute;
@@ -41,7 +42,6 @@ public class ProductAttributeController {
         this.productService = productService;
         this.productAttributeService = productAttributeService;
     }
-
 
     @PostMapping("/{sku}/attributes")
     @Operation(
@@ -112,7 +112,7 @@ public class ProductAttributeController {
         }
     }
 
-    @DeleteMapping("/{id}/attributes/{attributeKey}")
+    @DeleteMapping("/{sku}/attributes/{attributeKey}")
     @Operation(
             summary = "Удаление атрибута продукта",
             description = "Удаляет атрибут продукта по ключу (только свои продукты)"
@@ -135,15 +135,15 @@ public class ProductAttributeController {
             )
     })
     public ResponseEntity<Map<String, Object>> deleteAttribute(
-            @Parameter(description = "ID продукта", required = true)
-            @PathVariable Long id,
+            @Parameter(description = "артикул продукта", required = true)
+            @PathVariable String sku,
             @Parameter(description = "Ключ атрибута", required = true)
             @PathVariable String attributeKey) {
 
         Map<String, Object> response = new HashMap<>();
         try {
             User currentUser = userProvider.getAuthUser();
-            Product product = productService.getById(id);
+            Product product = productService.getBySku(sku);
 
             if (!product.getSeller().getId().equals(currentUser.getId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -169,7 +169,7 @@ public class ProductAttributeController {
         }
     }
 
-    @PutMapping("/{id}/attributes")
+    @PutMapping("/{sku}/attributes")
     @Operation(
             summary = "Массовое обновление атрибутов продукта",
             description = "Заменяет все атрибуты продукта новыми (только свои продукты)"
@@ -192,14 +192,14 @@ public class ProductAttributeController {
             )
     })
     public ResponseEntity<Map<String, Object>> updateAttributes(
-            @Parameter(description = "ID продукта", required = true)
-            @PathVariable Long id,
+            @Parameter(description = "артикул продукта", required = true)
+            @PathVariable String sku,
             @RequestBody Map<String, String> attributes) {
 
         Map<String, Object> response = new HashMap<>();
         try {
             User currentUser = userProvider.getAuthUser();
-            Product product = productService.getById(id);
+            Product product = productService.getBySku(sku);
 
             if (!product.getSeller().getId().equals(currentUser.getId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -219,6 +219,71 @@ public class ProductAttributeController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Ошибка при обновлении атрибутов: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{sku}/pducuctAttributes")
+    @Operation(
+            summary = "Получение всех атрибутов продукта",
+            description = "Получает все атрибуты продукта по его артикулу с пагинацией"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Атрибуты успешно получены",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Продукт не найден",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<Map<String, Object>> getAttributes(
+            @Parameter(description = "артикул продукта", required = true)
+            @PathVariable String sku,
+
+            @Parameter(description = "Номер страницы (0-based)")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "Количество элементов на странице")
+            @RequestParam(defaultValue = "6") int size,
+
+            @Parameter(description = "Поле для сортировки (key, value)")
+            @RequestParam(defaultValue = "key") String sortBy,
+
+            @Parameter(description = "Направление сортировки (asc, desc)")
+            @RequestParam(defaultValue = "asc") String sortDir) {
+
+        try {
+            Product product = productService.getBySku(sku);
+
+            Sort sort = sortDir.equalsIgnoreCase("desc")
+                    ? Sort.by(sortBy).descending()
+                    : Sort.by(sortBy).ascending();
+
+            Pageable pageable = PageRequest.of(page, size, sort);
+
+            Page<ProductAttribute> attributesPage = productAttributeService.getMany(product, pageable);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("attributes", attributesPage.getContent().stream()
+                    .collect(Collectors.toMap(ProductAttribute::getKey, ProductAttribute::getValue)));
+            response.put("currentPage", attributesPage.getNumber());
+            response.put("totalItems", attributesPage.getTotalElements());
+            response.put("totalPages", attributesPage.getTotalPages());
+            response.put("pageSize", attributesPage.getSize());
+            response.put("hasNext", attributesPage.hasNext());
+            response.put("hasPrevious", attributesPage.hasPrevious());
+
+            return ResponseEntity.ok(response);
+
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Продукт не найден"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Ошибка при получении атрибутов: " + e.getMessage()));
         }
     }
 }

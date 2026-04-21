@@ -3,7 +3,6 @@ package ru.daniil.image.service.product;
 import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.ProductImage;
 
-import java.util.List;
 import java.util.Map;
 
 public interface ProductImageService {
