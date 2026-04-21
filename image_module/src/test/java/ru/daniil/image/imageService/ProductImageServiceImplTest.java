@@ -14,7 +14,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.ProductImage;
 import ru.daniil.image.repository.ProductImageRepository;
-import ru.daniil.image.service.PrepareImageService;
 import ru.daniil.image.service.product.ProductImageServiceImpl;
 
 import java.io.ByteArrayInputStream;
@@ -33,9 +32,6 @@ class ProductImageServiceImplTest {
 
     @Mock
     private ProductImageRepository productImageRepository;
-
-    @Mock
-    private PrepareImageService prepareImageService;
 
     @Mock
     private MultipartFile mockFile;
@@ -60,29 +56,33 @@ class ProductImageServiceImplTest {
 
     @Test
     void saveImage_WithValidFile_ShouldSaveAndReturnFileName() throws IOException {
-        String expectedFileName = "generated-uuid.jpg";
-        when(prepareImageService.getFileUploadedName(mockFile)).thenReturn(expectedFileName);
+        when(mockFile.getOriginalFilename()).thenReturn("test-image.jpg");
+        when(mockFile.getContentType()).thenReturn("image/jpeg");
+        when(mockFile.getSize()).thenReturn(1024L);
+        when(mockFile.isEmpty()).thenReturn(false);
         when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[10]));
 
         String result = productImageService.saveImage(mockFile);
 
         assertNotNull(result);
-        assertEquals(expectedFileName, result);
-        assertTrue(Files.exists(tempDir.resolve(expectedFileName)));
-        verify(prepareImageService).getFileUploadedName(mockFile);
+        assertTrue(result.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.jpg"));
+        assertTrue(Files.exists(tempDir.resolve(result)));
     }
 
     @Test
     void saveImage_WhenIOExceptionOccurs_ShouldThrowRuntimeException() throws IOException {
-        String expectedFileName = "test.jpg";
-        when(prepareImageService.getFileUploadedName(mockFile)).thenReturn(expectedFileName);
+        when(mockFile.getOriginalFilename()).thenReturn("test-image.jpg");
+        when(mockFile.getContentType()).thenReturn("image/jpeg");
+        when(mockFile.getSize()).thenReturn(1024L);
+        when(mockFile.isEmpty()).thenReturn(false);
+        when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[10]));
+
         when(mockFile.getInputStream()).thenThrow(new IOException("Stream error"));
 
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> productImageService.saveImage(mockFile));
 
         assertTrue(exception.getMessage().contains("Возникла проблема при сохранении изображения"));
-        assertFalse(Files.exists(tempDir.resolve(expectedFileName)));
     }
 
     @Test

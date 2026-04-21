@@ -12,7 +12,12 @@ import ru.daniil.core.entity.base.user.User;
 public interface UserImageRepository extends CrudRepository<User, Long> {
     @Modifying
     @Transactional
-    @Query("UPDATE User u SET u.imageName = :imageName WHERE u.login = :login")
+    @Query("UPDATE User u SET u.imageName = :imageName WHERE u.email = :email")
     void saveImage(@Param("imageName") String imageName,
-                   @Param("login") String login);
+                   @Param("email") String email);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.imageName = null WHERE u.email = :email")
+    void clearImage(@Param("email") String email);
 }

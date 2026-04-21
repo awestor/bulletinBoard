@@ -5,11 +5,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.response.auth.UserInfoResponse;
 import ru.daniil.user.mapper.UserMapper;
@@ -17,6 +21,10 @@ import ru.daniil.user.service.user.UserService;
 
 import java.util.Map;
 
+@RestController
+@RequestMapping("/api/public")
+@Tag(name = "Api для работы с публичными api пользователей",
+        description = "API для работы с api пользователей, что доступны без авторизации")
 public class UserPublicController {
     private final UserService userService;
     private final UserMapper userMapper;

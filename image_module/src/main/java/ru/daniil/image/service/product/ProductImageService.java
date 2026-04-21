@@ -4,10 +4,16 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.ProductImage;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProductImageService {
 
-    List<String> getProductImages(String sku);
+    /**
+     * Возвращает все изображения продукта с указанием, какое из нах главное
+     * @param sku артикул продукта
+     * @return мапа из путей и значений isMain
+     */
+    Map<String, Boolean> getProductImages(String sku);
     /**
      * Сохраняет изображение на локальном устройстве
      * @param file MultipartFile файл

@@ -14,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.daniil.image.service.product.ProductImageService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/product-images")
@@ -52,14 +54,14 @@ public class ProductImageApiController {
                     content = @Content(mediaType = "application/json")
             )
     })
-    public ResponseEntity<List<String>> getProductImages(
+    public ResponseEntity<Object> getProductImages(
             @Parameter(description = "Артикул продукта", required = true, example = "SKU-12345")
             @PathVariable String sku) {
         try {
-            List<String> imagePaths = productImageService.getProductImages(sku);
+            Map<String, Boolean> imagePaths = productImageService.getProductImages(sku);
 
             if (imagePaths == null || imagePaths.isEmpty()) {
-                return ResponseEntity.ok(List.of());
+                return ResponseEntity.ok(Collections.emptyMap());
             }
 
             return ResponseEntity.ok(imagePaths);

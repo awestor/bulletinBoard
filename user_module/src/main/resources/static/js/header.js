@@ -31,7 +31,7 @@ function getDefaultAvatarSvg() {
 async function loadUserAvatar(username) {
     if (!username) return null;
     try {
-        const response = await fetch(`/api/users/avatar`, {
+        const response = await fetch(`/api/user-images/avatar`, {
             credentials: 'include'
         });
         if (response.ok) {
@@ -86,7 +86,7 @@ async function updateAuthStatus() {
         if (avatarUrl != 'none'){
             const avatarContainer = document.getElementById('avatarContainer');
             if (avatarContainer && avatarUrl) {
-                avatarContainer.innerHTML = `<img src="${avatarUrl}" alt="${username}" class="userAvatarImage" onerror="this.onerror=null; this.parentElement.innerHTML = \`${defaultSvg}\`">`;
+                avatarContainer.innerHTML = `<img src="${avatarUrl}" alt="${username}" class="userAvatarImage" onerror="this.onerror=null; this.parentElement.innerHTML = \`${defaultSvg}`;
             }
         }
     } else {

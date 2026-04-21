@@ -4,4 +4,3 @@ file:
     upload-dir: ${AVATAR_UPLOAD_DIR:uploads/users/}
   product:
     upload-dir: ${FILE_UPLOAD_DIR:uploads/products/}
-

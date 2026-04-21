@@ -2,9 +2,15 @@ package ru.daniil.image.service;
 
 import jakarta.validation.ValidationException;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +22,9 @@ public class PrepareImageService {
             "image/jpeg", "image/png", "image/gif", "image/webp"
     );
 
-    public @NonNull String getFileUploadedName(MultipartFile file) {
+    private static final Logger methodLogger = LoggerFactory.getLogger("METHOD-LOGGER");
+
+    protected @NonNull String getFileUploadedName(MultipartFile file) {
         if (file == null || file.isEmpty())
             throw new ValidationException("Необходимо загрузить хотя бы одно изображение");
 
@@ -36,5 +44,27 @@ public class PrepareImageService {
         }
 
         return UUID.randomUUID().toString() + fileExtension;
+    }
+
+    protected void deleteImageFileOrigin(String filename, String uploadDir) {
+        if (filename == null || filename.isBlank()) {
+            methodLogger.warn("Переданное название файла = null или пустое");
+            return;
+        }
+
+        try {
+            Path path = Paths.get(uploadDir, filename);
+
+            if (!Files.exists(path)) {
+                methodLogger.warn("Файл для удаления не найден: {}", filename);
+                return;
+            }
+
+            Files.delete(path);
+
+        } catch (IOException e) {
+            methodLogger.error("Ошибка при удалении файла {}: {}", filename, e.getMessage());
+            throw new RuntimeException("Не удалось удалить файл изображения: " + filename, e);
+        }
     }
 }

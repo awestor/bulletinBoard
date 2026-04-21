@@ -3,6 +3,7 @@ package ru.daniil.image.service.user;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -18,24 +19,22 @@ import java.nio.file.Paths;
 
 @Service
 @Transactional
-public class UserImageServiceImpl implements UserImageService {
+public class UserImageServiceImpl extends PrepareImageService implements UserImageService {
     private final UserImageRepository userImageRepository;
-    private final PrepareImageService prepareImageService;
     private static final Logger methodLogger = LoggerFactory.getLogger("METHOD-LOGGER");
 
     @Value("${file.user.upload-dir}")
     private String uploadDir;
 
-    public UserImageServiceImpl(UserImageRepository userImageRepository,
-                                PrepareImageService prepareImageService) {
+    public UserImageServiceImpl(UserImageRepository userImageRepository) {
         this.userImageRepository = userImageRepository;
-        this.prepareImageService = prepareImageService;
     }
 
     @Cacheable(value = "userImages",
-            key = "#username + '_' + #file.getOriginalFilename()", unless = "#result == null")
-    public String saveImage(MultipartFile file, String username) {
-        String fileName = prepareImageService.getFileUploadedName(file);
+            key = "#fileName", unless = "#result == null")
+    @Override
+    public String saveImage(MultipartFile file, String email) {
+        String fileName = getFileUploadedName(file);
         try{
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
@@ -48,15 +47,18 @@ public class UserImageServiceImpl implements UserImageService {
             methodLogger.info("Файл сохранен: {}, размер: {} байт, путь: {}",
                     fileName, file.getSize(), filePath);
 
-            userImageRepository.saveImage(fileName, username);
+            userImageRepository.saveImage(fileName, email);
         return filePath.toString();
         } catch (IOException e) {
             throw new RuntimeException("Возникла проблема при сохранении изображения: " + e.getMessage());
         }
     }
 
+    @Override
+    @Cacheable(value = "userImages",
+            key = "#fileName", unless = "#result == null")
     public String completePath(String filename) {
-        if (filename == null){
+        if (filename == null || filename.isEmpty()){
             methodLogger.info("Переданное название файла = null");
             return null;
         }
@@ -66,5 +68,17 @@ public class UserImageServiceImpl implements UserImageService {
             throw new BadCredentialsException("Изображение пользовательского аватара не найдено: " + filename);
         }
         return path.toString();
+    }
+
+    @Override
+    @CacheEvict(value = "userImages", key = "#fileName")
+    public void deleteUserAvatar(String email, String imageName) {
+        try {
+            deleteImageFileOrigin(imageName, uploadDir);
+            userImageRepository.clearImage(email);
+        } catch (RuntimeException e){
+            methodLogger.warn("Попытка удалить файл аватарки пользователя не увенчалась успехом");
+            throw e;
+        }
     }
 }

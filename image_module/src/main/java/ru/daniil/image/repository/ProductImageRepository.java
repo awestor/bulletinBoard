@@ -35,7 +35,6 @@ public interface ProductImageRepository extends CrudRepository<ProductImage, Lon
      */
     Optional<ProductImage> findByName(String name);
 
-
     /**
      * Удаляет все изображения для конкретного продукта
      * @param productId идентификатор продукта
@@ -45,15 +44,23 @@ public interface ProductImageRepository extends CrudRepository<ProductImage, Lon
     @Query("DELETE FROM ProductImage pi WHERE pi.product.id = :productId")
     void deleteByProductId(@Param("productId") Long productId);
 
+    /**
+     * Снимает статус главного изображения у всех изображений продукта
+     * @param fileName название текущего изображения
+     */
     @Modifying
     @Transactional
     @Query("UPDATE ProductImage pi1 SET pi1.isMain = false WHERE pi1.product.id = " +
-            "(SELECT pi2.product.id FROM ProductImage pi2 WHERE pi2.fileName = :fileName)")
+            "(SELECT pi2.product.id FROM ProductImage pi2 WHERE pi2.name = :fileName)")
     void unsetOtherMainImages(@Param("fileName") String fileName);
 
+    /**
+     * Устанавливает статус главного изображения продукта
+     * @param fileName название файла изображения
+     */
     @Modifying
     @Transactional
-    @Query("UPDATE ProductImage pi SET pi.isMain = true WHERE pi.fileName = :fileName")
+    @Query("UPDATE ProductImage pi SET pi.isMain = true WHERE pi.name = :fileName")
     void setMainByFileName(@Param("fileName") String fileName);
 
     /**
