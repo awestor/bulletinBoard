@@ -2,7 +2,9 @@ package ru.daniil.product.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,12 +16,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.exceptions.UserBlockedExeption;
@@ -32,6 +36,7 @@ import ru.daniil.product.service.product.ProductProcessorService;
 import ru.daniil.product.service.product.ProductService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -401,6 +406,49 @@ public class ProductApiController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Ошибка при удалении продукта: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping(value = "/{sku}/uploadImages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Загрузка изображений продукта",
+            description = "Загружает одно или несколько изображений для продукта. " +
+                    "Все изображения загружаются с isMain=false. " +
+                    "Для назначения главного изображения используйте отдельный эндпоинт"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Изображения успешно загружены",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Продукт с указанным SKU не найден",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Внутренняя ошибка сервера",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<List<String>> uploadImages(
+            @Parameter(description = "Артикул продукта", required = true)
+            @PathVariable String sku,
+
+            @RequestPart("files")
+            @ArraySchema(schema = @Schema(type = "string", format = "binary"))
+            List<MultipartFile> files) {
+
+        try {
+            List<String> filenames = productProcessorService.addManyProductImages(sku, files);
+            return ResponseEntity.ok(filenames);
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(List.of("Ошибка при загрузке изображений: " + e.getMessage()));
         }
     }
 }

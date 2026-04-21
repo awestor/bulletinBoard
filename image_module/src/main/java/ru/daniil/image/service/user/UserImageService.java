@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public interface UserImageService {
 
-    String saveImage(MultipartFile file, String username) throws IOException;
+    String saveImage(MultipartFile file, String username);
 
     String completePath(String filename);
 }

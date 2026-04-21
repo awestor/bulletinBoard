@@ -18,6 +18,9 @@ import ru.daniil.image.service.product.ProductImageService;
 import ru.daniil.product.service.attribute.ProductAttributeService;
 import ru.daniil.product.service.category.CategoryService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class ProductProcessorServiceImpl implements ProductProcessorService {
 
@@ -89,6 +92,37 @@ public class ProductProcessorServiceImpl implements ProductProcessorService {
 
         } catch (Exception e){
             throw new RuntimeException("Продукт не был создан. Причина: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    private String addProductImage(MultipartFile file, String sku) {
+        Product product = productService.getBySku(sku);
+        String productName = productImageService.saveImage(file);
+        ProductImage productImage = ProductImage.builder()
+                .product(product)
+                .name(productName)
+                .isMain(false)
+                .build();
+
+        productImageService.save(productImage);
+        return productImageService.completePath(productName);
+    }
+
+    @Override
+    public List<String> addManyProductImages(String sku, List<MultipartFile> files) {
+        try{
+            List<String> results = new ArrayList<>();
+            for (MultipartFile file :files){
+                results.add(addProductImage(
+                        file,
+                        sku
+                ));
+            }
+            return results;
+        }
+        catch (Exception e){
+            throw new RuntimeException("Ошибка при загрузке изображений: " + e.getMessage());
         }
     }
 

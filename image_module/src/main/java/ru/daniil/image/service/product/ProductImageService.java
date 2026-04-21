@@ -3,8 +3,11 @@ package ru.daniil.image.service.product;
 import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.ProductImage;
 
+import java.util.List;
+
 public interface ProductImageService {
 
+    List<String> getProductImages(String sku);
     /**
      * Сохраняет изображение на локальном устройстве
      * @param file MultipartFile файл
@@ -43,4 +46,10 @@ public interface ProductImageService {
      * @param productImage название изображения
      */
     void save(ProductImage productImage);
+
+    /**
+     * Устанавливает флаг главенства на одном файле
+     * @param fileName название файла
+     */
+    void setMain(String fileName);
 }

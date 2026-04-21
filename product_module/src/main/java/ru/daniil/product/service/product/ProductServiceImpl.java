@@ -10,7 +10,6 @@ import ru.daniil.core.entity.base.product.Category;
 import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.response.product.ProductFilterRequest;
 import ru.daniil.product.repository.ProductRepository;
-import ru.daniil.product.service.attribute.ProductAttributeService;
 
 import java.util.List;
 import java.util.Map;
@@ -21,12 +20,9 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final ProductAttributeService attributeService;
 
-    public ProductServiceImpl(ProductRepository productRepository,
-                              ProductAttributeService attributeService) {
+    public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.attributeService = attributeService;
     }
 
     @Override

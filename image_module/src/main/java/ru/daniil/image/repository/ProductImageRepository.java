@@ -14,11 +14,19 @@ import java.util.Optional;
 @Repository
 public interface ProductImageRepository extends CrudRepository<ProductImage, Long> {
     /**
-     * Находит все изображения для конкретного продукта
+     * Находит все изображения для конкретного продукта по id
      * @param productId идентификатор продукта
      * @return список всех найденных изображений List<ProductImage>
      */
     List<ProductImage> findByProductId(Long productId);
+
+    /**
+     * Находит все изображения для конкретного продукта по артикулу
+     * @param sku артикул продукта
+     * @return список всех найденных изображений List<ProductImage>
+     */
+    @Query("SELECT pi FROM ProductImage pi WHERE pi.product.sku = :sku")
+    List<ProductImage> findByProductSku(@Param("sku") String sku);
 
     /**
      * Находит запись о файле в БД
@@ -36,6 +44,17 @@ public interface ProductImageRepository extends CrudRepository<ProductImage, Lon
     @Transactional
     @Query("DELETE FROM ProductImage pi WHERE pi.product.id = :productId")
     void deleteByProductId(@Param("productId") Long productId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE ProductImage pi1 SET pi1.isMain = false WHERE pi1.product.id = " +
+            "(SELECT pi2.product.id FROM ProductImage pi2 WHERE pi2.fileName = :fileName)")
+    void unsetOtherMainImages(@Param("fileName") String fileName);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE ProductImage pi SET pi.isMain = true WHERE pi.fileName = :fileName")
+    void setMainByFileName(@Param("fileName") String fileName);
 
     /**
      * Удаляет !!!все!!! изображения из БД

@@ -1,14 +1,15 @@
 package ru.daniil.image.imageService;
 
-import jakarta.validation.ValidationException;
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.ProductImage;
@@ -244,5 +245,35 @@ class ProductImageServiceImplTest {
         productImageService.save(productImage);
 
         verify(productImageRepository).save(productImage);
+    }
+
+    @Test
+    void setMain_ShouldUpdateMainFlag_WhenFileExists() {
+        String fileName = "test-image.jpg";
+
+        doNothing().when(productImageRepository).unsetOtherMainImages(fileName);
+        doNothing().when(productImageRepository).setMainByFileName(fileName);
+
+        productImageService.setMain(fileName);
+
+        InOrder inOrder = inOrder(productImageRepository);
+        inOrder.verify(productImageRepository).unsetOtherMainImages(fileName);
+        inOrder.verify(productImageRepository).setMainByFileName(fileName);
+        verifyNoMoreInteractions(productImageRepository);
+    }
+
+    @Test
+    void setMain_ShouldPropagateException_WhenUnsetFails() {
+        String fileName = "test-image.jpg";
+
+        doThrow(new DataIntegrityViolationException("DB error"))
+                .when(productImageRepository).unsetOtherMainImages(fileName);
+
+        assertThrows(DataIntegrityViolationException.class, () ->
+                productImageService.setMain(fileName)
+        );
+
+        verify(productImageRepository).unsetOtherMainImages(fileName);
+        verify(productImageRepository, never()).setMainByFileName(anyString());
     }
 }

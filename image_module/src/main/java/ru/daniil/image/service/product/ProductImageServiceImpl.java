@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +18,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -33,6 +36,14 @@ public class ProductImageServiceImpl implements ProductImageService {
                                    PrepareImageService prepareImageService) {
         this.productImageRepository = productImageRepository;
         this.prepareImageService = prepareImageService;
+    }
+
+    @Override
+    public List<String> getProductImages(String sku) {
+        return productImageRepository.findByProductSku(sku)
+                .stream()
+                .map(image -> completePath(image.getName()))
+                .collect(Collectors.toList());
     }
 
     @Cacheable(value = "productImages",
@@ -159,5 +170,11 @@ public class ProductImageServiceImpl implements ProductImageService {
     @Override
     public void save(ProductImage productImage) {
         productImageRepository.save(productImage);
+    }
+
+    @Override
+    public void setMain(String fileName) {
+        productImageRepository.unsetOtherMainImages(fileName);
+        productImageRepository.setMainByFileName(fileName);
     }
 }

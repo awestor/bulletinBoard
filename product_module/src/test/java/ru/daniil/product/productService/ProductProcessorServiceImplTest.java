@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.Category;
 import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.product.ProductAttribute;
+import ru.daniil.core.entity.base.product.ProductImage;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.AuthProvider;
 import ru.daniil.core.enums.CategoryType;
@@ -54,6 +55,9 @@ class ProductProcessorServiceImplTest {
     private Product product;
     private CreateUpdateProductRequest request;
     private User user;
+    private MultipartFile mockImage;
+    private MultipartFile mockImage2;
+    private List<MultipartFile> files;
 
     @BeforeEach
     void setUp() {
@@ -85,8 +89,14 @@ class ProductProcessorServiceImplTest {
         attributes.put("size", "M");
         request.setAttributes(attributes);
 
-        MultipartFile mockImage = mock(MultipartFile.class);
+        mockImage = mock(MultipartFile.class);
         request.setImages(Collections.singletonList(mockImage));
+
+        mockImage2 = mock(MultipartFile.class);
+
+        files = new ArrayList<>();
+        files.add(mockImage);
+        files.add(mockImage2);
     }
 
     @Test
@@ -257,5 +267,71 @@ class ProductProcessorServiceImplTest {
 
         verify(productImageService).deleteAllinButch();
         verify(productService).deleteAll();
+    }
+
+    @Test
+    void addManyProductImages_WithValidData_ShouldSaveAllImagesAndReturnPaths() {
+        String expectedFilename1 = "product_image1.jpg";
+        String expectedFilename2 = "product_image2.jpg";
+        String expectedPath1 = "/uploads/products/product_image1.jpg";
+        String expectedPath2 = "/uploads/products/product_image2.jpg";
+
+        when(productService.getBySku("SKU123")).thenReturn(product);
+        when(productImageService.saveImage(mockImage)).thenReturn(expectedFilename1);
+        when(productImageService.saveImage(mockImage2)).thenReturn(expectedFilename2);
+        when(productImageService.completePath(expectedFilename1)).thenReturn(expectedPath1);
+        when(productImageService.completePath(expectedFilename2)).thenReturn(expectedPath2);
+        doNothing().when(productImageService).save(any(ProductImage.class));
+
+        List<String> results = productProcessorService.addManyProductImages("SKU123", files);
+
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertEquals(expectedPath1, results.get(0));
+        assertEquals(expectedPath2, results.get(1));
+
+        verify(productImageService, times(2)).saveImage(any(MultipartFile.class));
+        verify(productImageService, times(2)).save(any(ProductImage.class));
+    }
+
+    @Test
+    void addManyProductImages_WhenOneImageFails_ShouldProcessRemainingAndThrowException() {
+        String expectedFilename2 = "product_image2.jpg";
+        String expectedPath2 = "/uploads/products/product_image2.jpg";
+
+        when(productService.getBySku("SKU123")).thenReturn(product);
+        when(productImageService.saveImage(mockImage)).thenThrow(new RuntimeException("Ошибка сохранения первого файла"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> productProcessorService.addManyProductImages("SKU123", files));
+
+        assertTrue(exception.getMessage().contains("Ошибка при загрузке изображений"));
+        verify(productImageService, times(1)).saveImage(any(MultipartFile.class));
+        verify(productImageService, never()).save(any(ProductImage.class));
+        verify(productImageService, never()).completePath(expectedFilename2);
+    }
+
+    @Test
+    void addManyProductImages_WhenEmptyRequest_ShouldReturnEmptyList() {
+        files = Collections.emptyList();
+
+        List<String> results = productProcessorService.addManyProductImages("SKU123", files);
+
+        assertNotNull(results);
+        assertTrue(results.isEmpty());
+        verify(productImageService, never()).saveImage(any());
+        verify(productImageService, never()).save(any());
+    }
+
+    @Test
+    void addManyProductImages_WhenProductNotFound_ShouldThrowException() {
+        when(productService.getBySku("SKU123")).thenThrow(new NotFoundException("Продукт не найден"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> productProcessorService.addManyProductImages("SKU123", files));
+
+        assertTrue(exception.getMessage().contains("Продукт не найден"));
+        verify(productImageService, never()).saveImage(any());
+        verify(productImageService, never()).save(any());
     }
 }
