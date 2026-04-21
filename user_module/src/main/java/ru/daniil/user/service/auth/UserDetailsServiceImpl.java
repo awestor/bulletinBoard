@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.exceptions.UserBlockedExeption;
+import ru.daniil.core.exceptions.UserBlockedException;
 import ru.daniil.core.exceptions.UserNotFoundException;
 import ru.daniil.user.repository.UserRepository;
 
@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         if (!user.isAccountNonLocked()) {
-            throw new UserBlockedExeption("Аккаунт заблокирован до: " + user.getBlockedUntil());
+            throw new UserBlockedException("Аккаунт заблокирован до: " + user.getBlockedUntil());
         }
 
         return (UserDetails) user;

@@ -11,9 +11,6 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import ru.daniil.core.entity.base.order.Order;
 import ru.daniil.core.entity.base.order.OrderItem;
@@ -86,7 +83,7 @@ public class OrderItemApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = getAuthenticatedUser();
+            User user = userProvider.getAuthUser();
             OrderItem orderItem = orderProcessorService.addOrderItem(request, user);
 
             response.put("message", "Товар успешно добавлен в заказ");
@@ -135,7 +132,7 @@ public class OrderItemApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = getAuthenticatedUser();
+            User user = userProvider.getAuthUser();
             orderProcessorService.removeOrderItem(request, user);
 
             response.put("message", "Товар успешно удален из заказа");
@@ -181,7 +178,7 @@ public class OrderItemApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = getAuthenticatedUser();
+            User user = userProvider.getAuthUser();
             orderProcessorService.reduceQuantityOrderItem(request, user);
 
             response.put("message", "Количество товара успешно изменено");
@@ -223,7 +220,7 @@ public class OrderItemApiController {
             )
     })
     public ResponseEntity<List<OrderItem>> getOrderItems(@PathVariable String orderNumber) {
-        User user = getAuthenticatedUser();
+        User user = userProvider.getAuthUser();
 
         Order order = orderService.getByOrderNumber(orderNumber);
         if (!order.getUser().getId().equals(user.getId())) {
@@ -275,19 +272,5 @@ public class OrderItemApiController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-
-    private User getAuthenticatedUser() {
-        JwtAuthenticationToken authentication = (JwtAuthenticationToken)
-                SecurityContextHolder.getContext().getAuthentication();
-
-        assert authentication != null;
-        Jwt jwt = authentication.getToken();
-        String email = jwt.getClaimAsString("email");
-
-        return userProvider.getByEmail(email).orElseThrow(
-                () -> new NotFoundException("Пользователь не был аутентифицирован в системе")
-        );
     }
 }

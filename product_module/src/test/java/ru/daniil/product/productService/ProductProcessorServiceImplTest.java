@@ -16,7 +16,7 @@ import ru.daniil.core.entity.base.product.ProductImage;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.AuthProvider;
 import ru.daniil.core.enums.CategoryType;
-import ru.daniil.core.exceptions.UserBlockedExeption;
+import ru.daniil.core.exceptions.UserBlockedException;
 import ru.daniil.core.request.CreateUpdateProductRequest;
 import ru.daniil.image.service.product.ProductImageService;
 import ru.daniil.product.service.attribute.ProductAttributeService;
@@ -125,7 +125,7 @@ class ProductProcessorServiceImplTest {
     void create_WhenUserTradingBlocked_ShouldThrowException() {
         user.setTradingBlocked(true);
 
-        UserBlockedExeption exception = assertThrows(UserBlockedExeption.class,
+        UserBlockedException exception = assertThrows(UserBlockedException.class,
                 () -> productProcessorService.create(request, user));
 
         assertEquals("Пользователю запрещено выставлять объявления о продаже", exception.getMessage());

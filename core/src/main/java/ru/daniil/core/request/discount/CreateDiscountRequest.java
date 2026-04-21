@@ -1,15 +1,19 @@
-package ru.daniil.core.request;
+package ru.daniil.core.request.discount;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class DiscountRequest {
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreateDiscountRequest {
     @NotBlank(message = "Код акции обязателен")
     @Pattern(regexp = "^[A-Z0-9_-]{3,50}$",
             message = "Код акции должен состоять только из Заглавных букв латинского алфавита, '-', '_' и цифр (3-50 символов)")

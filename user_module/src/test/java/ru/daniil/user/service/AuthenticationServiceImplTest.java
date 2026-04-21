@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.AuthProvider;
-import ru.daniil.core.exceptions.UserBlockedExeption;
+import ru.daniil.core.exceptions.UserBlockedException;
 import ru.daniil.core.exceptions.UserNotFoundException;
 import ru.daniil.core.request.auth.LoginRequest;
 import ru.daniil.core.request.auth.RegistrationRequest;
@@ -170,7 +170,7 @@ class AuthenticationServiceImplTest {
     @Test
     void authenticate_WithBlockedUser_ShouldThrowBadCredentials() throws Exception {
         when(userDetailsService.loadUserByUsername("testuser"))
-                .thenThrow(new UserBlockedExeption("User is blocked"));
+                .thenThrow(new UserBlockedException("User is blocked"));
 
         assertThrows(BadCredentialsException.class,
                 () -> authenticationService.authenticate(loginRequest, response));

@@ -12,7 +12,7 @@ import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.product.ProductAttribute;
 import ru.daniil.core.entity.base.product.ProductImage;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.exceptions.UserBlockedExeption;
+import ru.daniil.core.exceptions.UserBlockedException;
 import ru.daniil.core.request.CreateUpdateProductRequest;
 import ru.daniil.image.service.product.ProductImageService;
 import ru.daniil.product.service.attribute.ProductAttributeService;
@@ -45,7 +45,7 @@ public class ProductProcessorServiceImpl implements ProductProcessorService {
     @Override
     public Product create(CreateUpdateProductRequest request, User user) {
         if (user.isTradingBlocked()) {
-            throw new UserBlockedExeption("Пользователю запрещено выставлять объявления о продаже");
+            throw new UserBlockedException("Пользователю запрещено выставлять объявления о продаже");
         }
 
         Category category =  categoryService.getByName(request.getCategoryName());

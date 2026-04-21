@@ -122,6 +122,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void updateParentForCategories (Category oldCategory, Category newCategory){
         List<Category> children = getNextCategories(oldCategory.getName());
         categoryRepository.updateParentForCategories(children, newCategory);

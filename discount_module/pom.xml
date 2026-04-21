@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent/>
 
-    <artifactId>product_module</artifactId>
+    <artifactId>discount_module</artifactId>
     <packaging>jar</packaging>
 
     <properties>
@@ -32,18 +32,6 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
-        </dependency>
-
-        <!-- Thymeleaf (если нужен) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-
-        <!-- HATEOAS -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
 
         <!-- OpenAPI/Swagger -->
@@ -87,13 +75,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- .env файлы -->
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>dotenv-java</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-
         <!-- Логирование -->
         <dependency>
             <groupId>net.logstash.logback</groupId>
@@ -117,7 +98,6 @@
             <artifactId>image_module</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-
     </dependencies>
 
 </project>

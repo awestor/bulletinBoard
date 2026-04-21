@@ -7,8 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.daniil.core.entity.base.discount.Discount;
-import ru.daniil.core.entity.base.discount.OrderDiscount;
 import ru.daniil.core.entity.base.order.Order;
 import ru.daniil.core.entity.base.order.OrderItem;
 import ru.daniil.core.entity.base.product.Category;
@@ -16,15 +14,17 @@ import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.request.orderItem.CreateOrderItemRequest;
 import ru.daniil.core.request.orderItem.DeleteOrderItemRequest;
-
 import ru.daniil.core.request.orderItem.ReduceQuantityRequest;
+import ru.daniil.order.service.order.OrderPriceRecalculationServiceImpl;
 import ru.daniil.order.service.order.OrderProcessorServiceImpl;
 import ru.daniil.order.service.order.OrderService;
 import ru.daniil.order.service.orderItem.OrderItemService;
 import ru.daniil.product.service.product.ProductService;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +41,9 @@ class OrderProcessorServiceImplTest {
 
     @Mock
     private ProductService productService;
+
+    @Mock
+    private OrderPriceRecalculationServiceImpl orderPriceRecalculationService;
 
     @InjectMocks
     private OrderProcessorServiceImpl orderProcessorService;
@@ -95,13 +98,13 @@ class OrderProcessorServiceImplTest {
         when(productService.getBySku("SKU123")).thenReturn(product);
         when(orderItemService.getByOrderNumber(order.getOrderNumber())).thenReturn(new ArrayList<>());
         when(orderItemService.createOrderItem(user, order, product, 3)).thenReturn(existingItem);
-        doNothing().when(orderService).updateTotalPrice(any(Order.class));
+        doNothing().when(orderPriceRecalculationService).recalculateTotals(order);
 
         OrderItem result = orderProcessorService.addOrderItem(createRequest, user);
 
         assertNotNull(result);
         verify(orderItemService).createOrderItem(user, order, product, 3);
-        verify(orderService).updateTotalPrice(order);
+        verify(orderPriceRecalculationService).recalculateTotals(order);
     }
 
     @Test
@@ -112,8 +115,7 @@ class OrderProcessorServiceImplTest {
         when(orderService.getLastOrCreateOrderByUser(user)).thenReturn(order);
         when(productService.getBySku("SKU123")).thenReturn(product);
         when(orderItemService.getByOrderNumber(order.getOrderNumber())).thenReturn(existingItems);
-        doNothing().when(orderItemService).updateItemQuantity(any(OrderItem.class));
-        doNothing().when(orderService).updateTotalPrice(any(Order.class));
+        doNothing().when(orderPriceRecalculationService).recalculateTotals(order);
 
         OrderItem result = orderProcessorService.addOrderItem(createRequest, user);
 
@@ -152,12 +154,12 @@ class OrderProcessorServiceImplTest {
         when(orderService.getLastOrCreateOrderByUser(user)).thenReturn(order);
         when(orderItemService.getByOrderNumber(order.getOrderNumber())).thenReturn(existingItems);
         doNothing().when(orderItemService).delete(1L);
-        doNothing().when(orderService).updateTotalPrice(any(Order.class));
+        doNothing().when(orderPriceRecalculationService).recalculateTotals(order);
 
         orderProcessorService.removeOrderItem(deleteRequest, user);
 
         verify(orderItemService).delete(1L);
-        verify(orderService).updateTotalPrice(order);
+        verify(orderPriceRecalculationService).recalculateTotals(order);
     }
 
     @Test
@@ -173,55 +175,6 @@ class OrderProcessorServiceImplTest {
     }
 
     @Test
-    void recalculateTotals_WithPercentageDiscount_ShouldApplyDiscount() {
-        List<OrderItem> items = Collections.singletonList(existingItem);
-        Discount discount = mock(Discount.class);
-        OrderDiscount orderDiscount = mock(OrderDiscount.class);
-
-        when(orderService.getLastOrCreateOrderByUser(user)).thenReturn(order);
-        when(orderItemService.getByOrderNumber(order.getOrderNumber())).thenReturn(items);
-        when(discount.getPercentage()).thenReturn(new BigDecimal("10.00"));
-        when(discount.getApplicableCategoryId()).thenReturn(1L);
-        when(orderDiscount.getDiscount()).thenReturn(discount);
-        when(productService.getBySku(product.getSku())).thenReturn(product);
-
-        order.getAppliedDiscounts().add(orderDiscount);
-
-        doNothing().when(orderItemService).updatePriceAtTime(any(OrderItem.class));
-        doNothing().when(orderService).updateTotalPrice(any(Order.class));
-
-        orderProcessorService.addOrderItem(createRequest, user);
-
-        verify(orderItemService).updatePriceAtTime(any(OrderItem.class));
-        verify(orderService).updateTotalPrice(order);
-    }
-
-    @Test
-    void recalculateTotals_WithFixedDiscount_ShouldApplyDiscount() {
-        List<OrderItem> items = Collections.singletonList(existingItem);
-        Discount discount = mock(Discount.class);
-        OrderDiscount orderDiscount = mock(OrderDiscount.class);
-
-        when(orderService.getLastOrCreateOrderByUser(user)).thenReturn(order);
-        when(orderItemService.getByOrderNumber(order.getOrderNumber())).thenReturn(items);
-        when(discount.getPercentage()).thenReturn(null);
-        when(discount.getFixedAmount()).thenReturn(new BigDecimal("50.00"));
-        when(discount.getApplicableCategoryId()).thenReturn(1L);
-        when(orderDiscount.getDiscount()).thenReturn(discount);
-        when(productService.getBySku(product.getSku())).thenReturn(product);
-
-        order.getAppliedDiscounts().add(orderDiscount);
-
-        doNothing().when(orderItemService).updatePriceAtTime(any(OrderItem.class));
-        doNothing().when(orderService).updateTotalPrice(any(Order.class));
-
-        orderProcessorService.addOrderItem(createRequest, user);
-
-        verify(orderItemService).updatePriceAtTime(any(OrderItem.class));
-        verify(orderService).updateTotalPrice(order);
-    }
-
-    @Test
     void reduceQuantityOrderItem_WhenItemExists_ShouldReduceQuantity() {
         existingItem.setQuantity(5);
         List<OrderItem> existingItems = Collections.singletonList(existingItem);
@@ -229,12 +182,11 @@ class OrderProcessorServiceImplTest {
         when(orderService.getLastOrCreateOrderByUser(user)).thenReturn(order);
         when(orderItemService.getByOrderNumber(order.getOrderNumber())).thenReturn(existingItems);
         doNothing().when(orderItemService).updateItemQuantity(any(OrderItem.class));
-        doNothing().when(orderService).updateTotalPrice(any(Order.class));
+        doNothing().when(orderPriceRecalculationService).recalculateTotals(order);
 
         orderProcessorService.reduceQuantityOrderItem(reduceRequest, user);
 
         assertEquals(4, existingItem.getQuantity()); // 5 - 1
-        verify(orderItemService).updateItemQuantity(existingItem);
-        verify(orderService).updateTotalPrice(order);
+        verify(orderPriceRecalculationService).recalculateTotals(order);
     }
 }

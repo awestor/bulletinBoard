@@ -15,7 +15,6 @@ import ru.daniil.core.enums.OrderStatus;
 import ru.daniil.order.repository.order.OrderRepository;
 import ru.daniil.order.service.order.OrderServiceImpl;
 
-
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;

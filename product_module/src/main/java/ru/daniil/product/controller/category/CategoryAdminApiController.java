@@ -77,7 +77,7 @@ public class CategoryAdminApiController {
         return ResponseEntity.ok(updatedCategory);
     }
 
-    @PatchMapping("/{categoryId}/update-parent")
+    @PatchMapping("/update-parent")
     @Operation(summary = "Обновление родителя для категорий",
             description = "Переносит все дочерние категории из одной категории в другую")
     @ApiResponses(value = {

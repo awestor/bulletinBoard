@@ -10,7 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import ru.daniil.core.entity.base.user.User;
 import ru.daniil.core.enums.AuthProvider;
-import ru.daniil.core.exceptions.UserBlockedExeption;
+import ru.daniil.core.exceptions.UserBlockedException;
 import ru.daniil.core.exceptions.UserNotFoundException;
 import ru.daniil.core.request.auth.LoginRequest;
 import ru.daniil.core.request.auth.RegistrationRequest;
@@ -74,7 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 user = (User) userDetailsService.loadUserByUsername(request.getUsername());
             } catch (UserNotFoundException e){
                 //ничего не делать
-            } catch (UserBlockedExeption ex){
+            } catch (UserBlockedException ex){
                 throw new BadCredentialsException(ex.getMessage());
             }
 

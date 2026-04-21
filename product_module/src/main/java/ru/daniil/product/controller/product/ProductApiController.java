@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.daniil.core.entity.base.product.Product;
 import ru.daniil.core.entity.base.user.User;
-import ru.daniil.core.exceptions.UserBlockedExeption;
+import ru.daniil.core.exceptions.UserBlockedException;
 import ru.daniil.core.request.CreateUpdateProductRequest;
 import ru.daniil.core.sharedInterfaces.UserProvider;
 import ru.daniil.product.mapper.ProductMapper;
@@ -106,7 +106,7 @@ public class ProductApiController {
 
         } catch (NotFoundException e){
             return ResponseEntity.notFound().build();
-        } catch (UserBlockedExeption ex){
+        } catch (UserBlockedException ex){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (BadRequestException exe){
             return ResponseEntity.badRequest().build();

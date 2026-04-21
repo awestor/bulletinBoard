@@ -51,6 +51,11 @@
             <artifactId>test_data_module</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>ru.daniil</groupId>
+            <artifactId>discount_module</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
         <!-- Тестовые зависимости -->
         <dependency>
