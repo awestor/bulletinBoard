@@ -11,12 +11,12 @@ import ru.daniil.core.response.comment.CommentResponse;
 public interface CommentMapper {
 
     @Mapping(target = "id", source = "comment.id")
-    @Mapping(target = "content", constant = "comment.content")
+    @Mapping(target = "content", source  = "comment.content")
     @Mapping(target = "rating", source = "comment.rating")
-    @Mapping(target = "productSku", constant = "productSku")
-    @Mapping(target = "authorLogin", constant = "user.login")
-    @Mapping(target = "authorEmail", constant = "user.email")
-    @Mapping(target = "createdAt", constant = "comment.createdAt")
-    @Mapping(target = "updatedAt", constant = "comment.updatedAt")
+    @Mapping(target = "productSku", source  = "productSku")
+    @Mapping(target = "authorLogin", source  = "user.login")
+    @Mapping(target = "authorEmail", source  = "user.email")
+    @Mapping(target = "createdAt", source  = "comment.createdAt")
+    @Mapping(target = "updatedAt", source  = "comment.updatedAt")
     CommentResponse toCommentResponse(Comment comment, String productSku, User user);
 }

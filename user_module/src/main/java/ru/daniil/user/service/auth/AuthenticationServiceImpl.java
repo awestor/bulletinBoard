@@ -166,14 +166,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         registrationRequest.setPassword(null);
 
         try {
-            infoLogger.info("Попытка создать запись в БД с данными: {}", registrationRequest);
             userService.registerUserWithoutValidation(registrationRequest);
             //В cookie указывается именно имя аккаунта внешнего провайдера, а не его фактический ник,
             // ведь его дубль в БД не столь важен для отображения и нужен только для осуществления связей в БД
             infoLogger.info("Регистрация прошла успешно");
         }
         catch(Exception ex){
-            infoLogger.info("Регистрация прошла не успешно");
+            infoLogger.info("Регистрация прошла не удачно");
             throw new BadCredentialsException("При создании пользователя с переданными данными возникла ошибка");
         }
         authCookieService.setAuthCookies(response, data.getAccessToken(), username);
