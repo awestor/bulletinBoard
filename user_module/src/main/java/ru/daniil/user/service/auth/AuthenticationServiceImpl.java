@@ -65,7 +65,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    @Transactional
     public JwtResponse authenticate(LoginRequest request, HttpServletResponse response) {
         try {
             User user = null;
@@ -137,11 +136,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         authCookieService.clearAuthCookies(response);
     }
 
+    @Transactional
     private void register(JwtResponse data, AuthProvider provider, HttpServletResponse response) {
         String accessToken = data.getAccessToken();
         Map<String, Object> claims = decodeJwtToken(accessToken);
 
         if(userService.existsByEmail((String) claims.get("email"))){
+            infoLogger.info("Входящий пользователь найден в БД");
             String username = (String) claims.get("name");
             authCookieService.setAuthCookies(response, accessToken, username);
             return;
@@ -149,13 +150,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         RegistrationRequest registrationRequest = new RegistrationRequest();
 
-        if(userService.existsByLogin((String) claims.get("name"))){
+        String rawUsername = (String) claims.get("name");
+        String username = rawUsername.replaceAll("[\\s;,]", "");
+        if(userService.existsByLogin(username)){
             registrationRequest.setLogin(
                     UUID.randomUUID().toString().replace("-", "").substring(0, 16)
             );
         }
         else {
-            registrationRequest.setLogin((String) claims.get("name"));
+            registrationRequest.setLogin(username);
         }
 
         registrationRequest.setEmail((String) claims.get("email"));
@@ -163,14 +166,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         registrationRequest.setPassword(null);
 
         try {
+            infoLogger.info("Попытка создать запись в БД с данными: {}", registrationRequest);
             userService.registerUserWithoutValidation(registrationRequest);
             //В cookie указывается именно имя аккаунта внешнего провайдера, а не его фактический ник,
             // ведь его дубль в БД не столь важен для отображения и нужен только для осуществления связей в БД
-            authCookieService.setAuthCookies(response, data.getAccessToken(), (String) claims.get("name"));
+            infoLogger.info("Регистрация прошла успешно");
         }
         catch(Exception ex){
+            infoLogger.info("Регистрация прошла не успешно");
             throw new BadCredentialsException("При создании пользователя с переданными данными возникла ошибка");
         }
+        authCookieService.setAuthCookies(response, data.getAccessToken(), username);
     }
 
     /**

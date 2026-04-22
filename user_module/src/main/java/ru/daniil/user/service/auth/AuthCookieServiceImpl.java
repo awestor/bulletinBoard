@@ -17,7 +17,7 @@ public class AuthCookieServiceImpl implements AuthCookieService {
      */
     public void setAuthCookies(HttpServletResponse response, String accessToken, String username) {
         setCookie(response, CookieType.ACCESS_TOKEN.toString(), accessToken, true);
-        setCookie(response, CookieType.USERNAME.toString(), username.replaceAll("[\\s;,]", "_"), false);
+        setCookie(response, CookieType.USERNAME.toString(), username.replaceAll("[\\s;,]", ""), false);
     }
 
     /**

@@ -36,6 +36,7 @@ public class RegistrationRequest {
         this.login = login;
         this.email = email;
         this.password = password;
+        this.authProvider = AuthProvider.LOCAL;
     }
 
     public RegistrationRequest(String login, String email, String password, AuthProvider authProvider) {

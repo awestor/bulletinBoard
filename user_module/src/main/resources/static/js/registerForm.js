@@ -114,7 +114,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 setButtonLoading('registerBtn', true);
                 try {
-                    await handleLocalRegister({ name, email, password });
+                    const userData = {
+                            login: name,
+                            email: email,
+                            password: password,
+                            authProvider: "LOCAL"
+                        };
+                    await handleLocalRegister(userData);
                     showMessage('Регистрация успешна!', 'success');
                     setTimeout(() => {
                         window.location.href = '/cabinet';

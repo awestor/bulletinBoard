@@ -2,6 +2,7 @@ package ru.daniil.user.service.auth;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -352,17 +353,15 @@ public class KeycloakServiceImpl implements KeycloakService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(adminToken);
 
-        Map<String, Object> userPayload = Map.of(
+        HttpEntity<Map<String, Object>> entity = getMapHttpEntityForRegister(Map.of(
                 "username", user.getUsername(),
                 "email", user.getEmail(),
                 "emailVerified", true,
                 "enabled", true,
-                "firstName", "---",
-                "lastName", "---",
+                "firstName", user.getUsername().substring(0, Math.min(3, user.getUsername().length())),
+                "lastName", user.getUsername().substring(Math.min(3, user.getUsername().length())),
                 "attributes", Map.of("localUserId", user.getId().toString())
-        );
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(userPayload, headers);
+        ), headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity(createUserUrl, entity, String.class);
 
@@ -387,6 +386,13 @@ public class KeycloakServiceImpl implements KeycloakService {
         }
 
         throw new RuntimeException("Не удалось получить ID созданного пользователя");
+    }
+
+    private static @NonNull HttpEntity<Map<String, Object>> getMapHttpEntityForRegister(Map<String, Object> user, HttpHeaders headers) {
+        Map<String, Object> userPayload = user;
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(userPayload, headers);
+        return entity;
     }
 
     /**

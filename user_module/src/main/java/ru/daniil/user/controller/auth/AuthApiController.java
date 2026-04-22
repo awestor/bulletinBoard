@@ -7,6 +7,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -30,6 +32,7 @@ import java.util.Map;
 public class AuthApiController {
 
     private final AuthenticationService authenticationService;
+    private static final Logger infoLogger = LoggerFactory.getLogger("INFO-LOGGER");
 
     public AuthApiController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
@@ -59,7 +62,7 @@ public class AuthApiController {
             HttpServletResponse response) {
         try {
             JwtResponse jwtResponse = authenticationService.authenticate(request, response);
-
+            infoLogger.info("Возврат ответа {}", jwtResponse);
             return ResponseEntity.ok(jwtResponse);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
