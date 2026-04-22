@@ -162,6 +162,19 @@
 				<plugin>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
+					<configuration>
+						<mainClass>ru.daniil.app.BulletinBoardApplication</mainClass>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>3.1.0</version>
+					<configuration>
+						<mainClass>ru.daniil.app.BulletinBoardApplication</mainClass>
+						<workingDirectory>${project.basedir}/..</workingDirectory>
+						<classpathScope>runtime</classpathScope>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

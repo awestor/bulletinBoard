@@ -1,0 +1,282 @@
+2026-04-22 20:35:01.381 [main] INFO  r.d.app.BulletinBoardApplication - Starting BulletinBoardApplication using Java 21.0.6 with PID 5412 (E:\temp\SolarСourseJava\bulletinBoard\app\target\classes started by Daniil in E:\temp\SolarСourseJava\bulletinBoard\app)
+2026-04-22 20:35:01.383 [main] INFO  r.d.app.BulletinBoardApplication - The following 7 profiles are active: "core", "security", "cache", "image", "user", "order", "dev"
+2026-04-22 20:35:03.571 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-04-22 20:35:03.573 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-22 20:35:03.574 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-04-22 20:35:03.716 [main] DEBUG o.s.b.w.s.ServletContextInitializerBeans - Mapping filters: springSecurityFilterChain urls=[/*] order=-100, resourceUrlEncodingFilter urls=[/*] order=2147483647, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105, jwtCookieFilter urls=[/*] order=2147483647
+2026-04-22 20:35:03.716 [main] DEBUG o.s.b.w.s.ServletContextInitializerBeans - Mapping servlets: dispatcherServlet urls=[/]
+2026-04-22 20:35:03.739 [main] DEBUG o.s.w.s.r.ResourceUrlEncodingFilter - Filter 'resourceUrlEncodingFilter' configured for use
+2026-04-22 20:35:03.740 [main] DEBUG o.s.b.w.s.DelegatingFilterProxyRegistrationBean$1 - Filter 'springSecurityFilterChain' configured for use
+2026-04-22 20:35:03.992 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Scanning for classpath resources at 'classpath:db/callback' ...
+2026-04-22 20:35:03.992 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Determining location urls for classpath:db/callback using ClassLoader jdk.internal.loader.ClassLoaders$AppClassLoader@3d4eac69 ...
+2026-04-22 20:35:03.992 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Unable to resolve location classpath:db/callback.
+2026-04-22 20:35:03.992 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Scanning for classpath resources at 'classpath:com/example/order/impl/db/migration' ...
+2026-04-22 20:35:03.993 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Determining location urls for classpath:com/example/order/impl/db/migration using ClassLoader jdk.internal.loader.ClassLoaders$AppClassLoader@3d4eac69 ...
+2026-04-22 20:35:03.993 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Unable to resolve location classpath:com/example/order/impl/db/migration.
+2026-04-22 20:35:03.993 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Scanning for classes at classpath:com/example/order/impl/db/migration
+2026-04-22 20:35:03.993 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Scanning for classpath resources at 'classpath:com/example/user/impl/db/migration' ...
+2026-04-22 20:35:03.993 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Determining location urls for classpath:com/example/user/impl/db/migration using ClassLoader jdk.internal.loader.ClassLoaders$AppClassLoader@3d4eac69 ...
+2026-04-22 20:35:03.994 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Unable to resolve location classpath:com/example/user/impl/db/migration.
+2026-04-22 20:35:03.994 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Scanning for classes at classpath:com/example/user/impl/db/migration
+2026-04-22 20:35:03.994 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Scanning for classpath resources at 'classpath:db/migration' ...
+2026-04-22 20:35:03.994 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Determining location urls for classpath:db/migration using ClassLoader jdk.internal.loader.ClassLoaders$AppClassLoader@3d4eac69 ...
+2026-04-22 20:35:03.995 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Scanning URL: jar:file:/E:/temp/Solar%d0%a1ourseJava/bulletinBoard/target/project-local-repo/ru.daniil/core/0.0.1-SNAPSHOT/core-0.0.1-SNAPSHOT.jar!/db/migration
+2026-04-22 20:35:03.998 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/
+2026-04-22 20:35:03.998 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1_1__create_refresh_tokens_table.sql
+2026-04-22 20:35:03.999 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1_2__add_auth_provider_fild_in_user_table.sql
+2026-04-22 20:35:03.999 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1_3__drop_refresh_tokens_table.sql
+2026-04-22 20:35:03.999 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1_4__cleanup_roles_tables.sql
+2026-04-22 20:35:03.999 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1_5__add_seller_to_products.sql
+2026-04-22 20:35:03.999 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1_6__rename_image_tabe_path_column.sql
+2026-04-22 20:35:03.999 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1_7__create_wallet_tabel.sql
+2026-04-22 20:35:03.999 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1_8__create_wallet_transaction_tabel.sql
+2026-04-22 20:35:03.999 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1_9__create_comment_table.sql
+2026-04-22 20:35:03.999 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Found resource: db/migration/V1__create_tables.sql
+2026-04-22 20:35:04.000 [main] DEBUG o.f.c.i.s.classpath.ClassPathScanner - Scanning for classes at classpath:db/migration
+2026-04-22 20:35:04.006 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-22 20:35:04.184 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@43e30f15
+2026-04-22 20:35:04.186 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-22 20:35:04.210 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/ (filename: )
+2026-04-22 20:35:04.210 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1__create_tables.sql
+2026-04-22 20:35:04.211 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1_8__create_wallet_transaction_tabel.sql
+2026-04-22 20:35:04.211 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1_4__cleanup_roles_tables.sql
+2026-04-22 20:35:04.211 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1_9__create_comment_table.sql
+2026-04-22 20:35:04.212 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1_3__drop_refresh_tokens_table.sql
+2026-04-22 20:35:04.212 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1_5__add_seller_to_products.sql
+2026-04-22 20:35:04.212 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1_2__add_auth_provider_fild_in_user_table.sql
+2026-04-22 20:35:04.212 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1_6__rename_image_tabe_path_column.sql
+2026-04-22 20:35:04.212 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1_1__create_refresh_tokens_table.sql
+2026-04-22 20:35:04.212 [main] DEBUG o.f.c.i.r.ResourceNameValidator - Validating V1_7__create_wallet_tabel.sql
+2026-04-22 20:35:04.217 [main] DEBUG o.f.c.i.d.DatabaseTypeRegister - Multiple databases found that handle url 'jdbc:postgresql://localhost:5432/bulletinBoard': CockroachDB,PostgreSQL
+2026-04-22 20:35:04.218 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/bulletinBoard (PostgreSQL 17.2)
+2026-04-22 20:35:04.218 [main] DEBUG org.flywaydb.core.FlywayExecutor - Database Type: PostgreSQL
+2026-04-22 20:35:04.219 [main] DEBUG org.flywaydb.core.FlywayExecutor - Driver: PostgreSQL JDBC Driver 42.7.9
+2026-04-22 20:35:04.219 [main] DEBUG org.flywaydb.core.FlywayExecutor - DDL Transactions Supported: true
+2026-04-22 20:35:04.221 [main] DEBUG o.f.c.i.s.SchemaHistoryFactory - Schemas: 
+2026-04-22 20:35:04.221 [main] DEBUG o.f.c.i.s.SchemaHistoryFactory - Default schema: null
+2026-04-22 20:35:04.232 [main] DEBUG org.flywaydb.core.FlywayExecutor - Scanning for script callbacks ...
+2026-04-22 20:35:04.234 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/ (filename: )
+2026-04-22 20:35:04.236 [main] DEBUG o.f.c.i.c.SqlScriptCallbackFactory - Scanning for SQL callbacks ...
+2026-04-22 20:35:04.236 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/ (filename: )
+2026-04-22 20:35:04.245 [main] DEBUG o.f.core.internal.command.DbValidate - Validating migrations ...
+2026-04-22 20:35:04.248 [main] DEBUG o.f.c.a.c.ClassicConfiguration - CherryPickConfigurationExtension not found
+2026-04-22 20:35:04.249 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/ (filename: )
+2026-04-22 20:35:04.262 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1__create_tables.sql (filename: V1__create_tables.sql)
+2026-04-22 20:35:04.262 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_8__create_wallet_transaction_tabel.sql (filename: V1_8__create_wallet_transaction_tabel.sql)
+2026-04-22 20:35:04.262 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_4__cleanup_roles_tables.sql (filename: V1_4__cleanup_roles_tables.sql)
+2026-04-22 20:35:04.263 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_9__create_comment_table.sql (filename: V1_9__create_comment_table.sql)
+2026-04-22 20:35:04.263 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_3__drop_refresh_tokens_table.sql (filename: V1_3__drop_refresh_tokens_table.sql)
+2026-04-22 20:35:04.263 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_5__add_seller_to_products.sql (filename: V1_5__add_seller_to_products.sql)
+2026-04-22 20:35:04.263 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_2__add_auth_provider_fild_in_user_table.sql (filename: V1_2__add_auth_provider_fild_in_user_table.sql)
+2026-04-22 20:35:04.263 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_6__rename_image_tabe_path_column.sql (filename: V1_6__rename_image_tabe_path_column.sql)
+2026-04-22 20:35:04.263 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/ (filename: )
+2026-04-22 20:35:04.263 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_1__create_refresh_tokens_table.sql (filename: V1_1__create_refresh_tokens_table.sql)
+2026-04-22 20:35:04.263 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_7__create_wallet_tabel.sql (filename: V1_7__create_wallet_tabel.sql)
+2026-04-22 20:35:04.264 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1__create_tables.sql (filename: V1__create_tables.sql)
+2026-04-22 20:35:04.264 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_8__create_wallet_transaction_tabel.sql (filename: V1_8__create_wallet_transaction_tabel.sql)
+2026-04-22 20:35:04.265 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_4__cleanup_roles_tables.sql (filename: V1_4__cleanup_roles_tables.sql)
+2026-04-22 20:35:04.265 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_9__create_comment_table.sql (filename: V1_9__create_comment_table.sql)
+2026-04-22 20:35:04.265 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_3__drop_refresh_tokens_table.sql (filename: V1_3__drop_refresh_tokens_table.sql)
+2026-04-22 20:35:04.265 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_5__add_seller_to_products.sql (filename: V1_5__add_seller_to_products.sql)
+2026-04-22 20:35:04.265 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_2__add_auth_provider_fild_in_user_table.sql (filename: V1_2__add_auth_provider_fild_in_user_table.sql)
+2026-04-22 20:35:04.265 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_6__rename_image_tabe_path_column.sql (filename: V1_6__rename_image_tabe_path_column.sql)
+2026-04-22 20:35:04.266 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/ (filename: )
+2026-04-22 20:35:04.266 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_1__create_refresh_tokens_table.sql (filename: V1_1__create_refresh_tokens_table.sql)
+2026-04-22 20:35:04.266 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_7__create_wallet_tabel.sql (filename: V1_7__create_wallet_tabel.sql)
+2026-04-22 20:35:04.266 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/ (filename: )
+2026-04-22 20:35:04.268 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1__create_tables.sql (filename: V1__create_tables.sql)
+2026-04-22 20:35:04.268 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_8__create_wallet_transaction_tabel.sql (filename: V1_8__create_wallet_transaction_tabel.sql)
+2026-04-22 20:35:04.268 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_4__cleanup_roles_tables.sql (filename: V1_4__cleanup_roles_tables.sql)
+2026-04-22 20:35:04.269 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_9__create_comment_table.sql (filename: V1_9__create_comment_table.sql)
+2026-04-22 20:35:04.269 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_3__drop_refresh_tokens_table.sql (filename: V1_3__drop_refresh_tokens_table.sql)
+2026-04-22 20:35:04.269 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_5__add_seller_to_products.sql (filename: V1_5__add_seller_to_products.sql)
+2026-04-22 20:35:04.269 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_2__add_auth_provider_fild_in_user_table.sql (filename: V1_2__add_auth_provider_fild_in_user_table.sql)
+2026-04-22 20:35:04.269 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_6__rename_image_tabe_path_column.sql (filename: V1_6__rename_image_tabe_path_column.sql)
+2026-04-22 20:35:04.269 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/ (filename: )
+2026-04-22 20:35:04.270 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_1__create_refresh_tokens_table.sql (filename: V1_1__create_refresh_tokens_table.sql)
+2026-04-22 20:35:04.270 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_7__create_wallet_tabel.sql (filename: V1_7__create_wallet_tabel.sql)
+2026-04-22 20:35:04.270 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1__create_tables.sql (filename: V1__create_tables.sql)
+2026-04-22 20:35:04.271 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_8__create_wallet_transaction_tabel.sql (filename: V1_8__create_wallet_transaction_tabel.sql)
+2026-04-22 20:35:04.271 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_4__cleanup_roles_tables.sql (filename: V1_4__cleanup_roles_tables.sql)
+2026-04-22 20:35:04.271 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_9__create_comment_table.sql (filename: V1_9__create_comment_table.sql)
+2026-04-22 20:35:04.271 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_3__drop_refresh_tokens_table.sql (filename: V1_3__drop_refresh_tokens_table.sql)
+2026-04-22 20:35:04.271 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_5__add_seller_to_products.sql (filename: V1_5__add_seller_to_products.sql)
+2026-04-22 20:35:04.271 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_2__add_auth_provider_fild_in_user_table.sql (filename: V1_2__add_auth_provider_fild_in_user_table.sql)
+2026-04-22 20:35:04.272 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_6__rename_image_tabe_path_column.sql (filename: V1_6__rename_image_tabe_path_column.sql)
+2026-04-22 20:35:04.272 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/ (filename: )
+2026-04-22 20:35:04.272 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_1__create_refresh_tokens_table.sql (filename: V1_1__create_refresh_tokens_table.sql)
+2026-04-22 20:35:04.273 [main] DEBUG o.f.core.internal.scanner.Scanner - Filtering out resource: db/migration/V1_7__create_wallet_tabel.sql (filename: V1_7__create_wallet_tabel.sql)
+2026-04-22 20:35:04.293 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 10 migrations (execution time 00:00.046s)
+2026-04-22 20:35:04.295 [main] DEBUG o.f.core.internal.command.DbSchemas - Skipping creation of existing schema: "public"
+2026-04-22 20:35:04.344 [main] DEBUG o.f.c.a.c.ClassicConfiguration - CherryPickConfigurationExtension not found
+2026-04-22 20:35:04.346 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema "public": 1.9
+2026-04-22 20:35:04.349 [main] INFO  o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
+2026-04-22 20:35:04.357 [main] DEBUG org.flywaydb.core.FlywayExecutor - Memory usage: 57 of 96M
+2026-04-22 20:35:05.100 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-22 20:35:05.524 [main] DEBUG o.h.t.s.s.SchemaManagementToolCoordinator - No schema actions specified for contributor 'orm'
+2026-04-22 20:35:06.439 [main] DEBUG o.h.t.s.s.SchemaManagementToolCoordinator - No schema actions specified for contributor 'orm'
+2026-04-22 20:35:06.439 [main] DEBUG o.h.t.s.s.SchemaManagementToolCoordinator - No schema management actions found
+2026-04-22 20:35:08.831 [main] DEBUG org.springframework.web.HttpLogging - HTTP GET http://docker.org:9090/realms/bulletin-board/.well-known/openid-configuration
+2026-04-22 20:35:08.837 [main] DEBUG org.springframework.web.HttpLogging - Accept=[application/json, application/yaml, application/*+json]
+2026-04-22 20:35:08.873 [main] DEBUG org.springframework.web.HttpLogging - Response 200 OK
+2026-04-22 20:35:08.874 [main] DEBUG org.springframework.web.HttpLogging - Reading to [java.util.Map<java.lang.String, java.lang.Object>]
+2026-04-22 20:35:10.553 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.o.c.OrderApiController:
+	{GET [/api/orders/{orderNumber}]}: getOrderByNumber(String)
+	{GET [/api/orders/history]}: getOrderHistory()
+	{DELETE [/api/orders/{orderId}]}: deleteOrder(Long)
+	{GET [/api/orders/current]}: getCurrentOrder()
+2026-04-22 20:35:10.561 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.o.c.OrderDiscountController:
+	{POST [/api/orderDisscount/{orderNumber}/{discountCode}]}: applyDiscount(String,String)
+	{DELETE [/api/orderDisscount/{orderNumber}/{discountCode}]}: removeDiscount(String,String)
+	{GET [/api/orderDisscount/{orderNumber}/discounts]}: getAppliedDiscounts(String)
+2026-04-22 20:35:10.565 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.o.c.OrderItemApiController:
+	{GET [/api/order-items/order/{orderNumber}]}: getOrderItems(String)
+	{POST [/api/order-items/add]}: addOrderItem(CreateOrderItemRequest)
+	{DELETE [/api/order-items/reduce]}: removeOrderItem(ReduceQuantityRequest)
+	{DELETE [/api/order-items/remove]}: removeOrderItem(DeleteOrderItemRequest)
+	{GET [/api/order-items/reservations/{sku}]}: getReservationCount(String)
+2026-04-22 20:35:10.571 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.o.c.PaymentApiController:
+	{POST [/api/payments/initiate]}: initiatePayment()
+	{POST [/api/payments/cancel/{orderNumber}]}: cancelPayment(UpdateStatusPaymentRequest)
+	{POST [/api/payments/complete]}: completePayment(UpdateStatusPaymentRequest)
+2026-04-22 20:35:10.574 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.o.c.WalletApiController:
+	{GET [/api/wallet/balance]}: getBalance()
+	{POST [/api/wallet/deposit]}: deposit(DepositRequest)
+	{GET [/api/wallet/transactions/{transactionId}]}: getTransaction(Long)
+	{GET [/api/wallet/transactions]}: getTransactions()
+	{GET [/api/wallet/frozen]}: getActiveFreezes()
+2026-04-22 20:35:10.575 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.p.c.MainPageController:
+	{GET [/]}: showLoginForm()
+2026-04-22 20:35:10.579 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.p.c.c.CategoryAdminApiController:
+	{PUT [/api/admin/category/{categoryOldName}]}: updateCategory(String,CreateCategoryRequest)
+	{DELETE [/api/admin/category/{categoryName}]}: deleteCategory(String)
+	{POST [/api/admin/category]}: createCategory(CreateCategoryRequest)
+	{PATCH [/api/admin/category/update-parent]}: updateParentForCategories(Long,Long)
+2026-04-22 20:35:10.584 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.p.c.c.CategoryApiController:
+	{GET [/api/public/category/leaf]}: getLeafCategories()
+	{GET [/api/public/category/by-id/{id}]}: getCategoryById(Long)
+	{GET [/api/public/category/{categoryName}/next]}: getNextCategories(String)
+	{GET [/api/public/category/by-name/{categoryName}]}: getCategoryByName(String)
+	{GET [/api/public/category/root]}: getRootCategories()
+2026-04-22 20:35:10.586 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.p.c.p.ProductAdminApiController:
+	{DELETE [/api/admin/products/{sku}]}: deleteProduct(String)
+2026-04-22 20:35:10.590 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.p.c.p.ProductApiController:
+	{POST [/api/products/create]}: generateTestProducts(CreateUpdateProductRequest)
+	{PUT [/api/products/{id}]}: updateProduct(Long,CreateUpdateProductRequest)
+	{POST [/api/products/{sku}/uploadImages], consumes [multipart/form-data]}: uploadImages(String,List)
+	{GET [/api/products/my]}: getMyProducts(int,int,String,String)
+	{DELETE [/api/products/{sku}]}: deleteProduct(String)
+2026-04-22 20:35:10.594 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.p.c.p.ProductAttributeController:
+	{GET [/api/attributes/{sku}/pducuctAttributes]}: getAttributes(String,int,int,String,String)
+	{POST [/api/attributes/{sku}/attributes]}: addAttribute(String,Map)
+	{PUT [/api/attributes/{sku}/attributes]}: updateAttributes(String,Map)
+	{DELETE [/api/attributes/{sku}/attributes/{attributeKey}]}: deleteAttribute(String,String)
+2026-04-22 20:35:10.596 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.p.c.p.productPublicApiController:
+	{GET [/api/public/products/sku/{sku}]}: getProductBySku(String)
+	{POST [/api/public/products/filter]}: filterProducts(ProductFilterRequest,int,int,String,String)
+2026-04-22 20:35:10.598 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.u.c.a.AuthApiController:
+	{POST [/api/auth/register]}: register(RegistrationRequest,HttpServletResponse)
+	{POST [/api/auth/login]}: login(LoginRequest,HttpServletResponse)
+	{POST [/api/auth/logout]}: logout(HttpServletRequest,HttpServletResponse)
+	{POST [/api/auth/refresh]}: refreshToken(HttpServletRequest,HttpServletResponse)
+	{POST [/api/auth/token]}: exchangeCode(Map,HttpServletResponse)
+	{POST [/api/auth/registerByToken]}: registerByToken(JwtResponse,String,HttpServletResponse)
+2026-04-22 20:35:10.600 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.u.c.a.AuthViewController:
+	{GET [/login]}: loginPage()
+	{GET [/register]}: registerPage()
+	{GET [/test-auth]}: testAuthPage()
+2026-04-22 20:35:10.603 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.u.c.u.UserAdminController:
+	{PUT [/api/admin/users/{userId}/block]}: blockUser(Long,LocalDate)
+	{PUT [/api/admin/users/{userId}/unblock]}: unblockUser(Long)
+	{PUT [/api/admin/users/{userId}/block-trading]}: blockTrading(Long)
+	{PUT [/api/admin/users/{userId}/unblock-trading]}: unblockTrading(Long)
+2026-04-22 20:35:10.607 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.u.c.u.UserImageApiController:
+	{GET [/api/public/user-images/avatar]}: getUserAvatar()
+	{POST [/api/public/user-images/avatar], consumes [multipart/form-data]}: uploadAvatar(MultipartFile)
+	{DELETE [/api/public/user-images/avatar]}: deleteAvatar()
+2026-04-22 20:35:10.608 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.u.c.u.UserPublicController:
+	{GET [/api/public/{commentId}/user]}: getUserByCommentId(Long)
+2026-04-22 20:35:10.610 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.i.c.ProductImageApiController:
+	{POST [/api/product-images/setMainImage]}: setMainImage(String)
+	{DELETE [/api/product-images/{filename}]}: deleteImage(String)
+	{GET [/api/product-images/product/{sku}]}: getProductImages(String)
+2026-04-22 20:35:10.612 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.t.c.c.CategoryTestDataController:
+	{GET [/api/test/categpry/status]}: getStatus()
+	{POST [/api/test/categpry/regenerate]}: regenerateCategories()
+	{POST [/api/test/categpry/generate]}: generateTestCategories()
+	{DELETE [/api/test/categpry/clear]}: clearCategories()
+2026-04-22 20:35:10.614 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.t.c.p.ProductTestDataController:
+	{POST [/api/test/product/generate]}: generateTestProducts()
+	{GET [/api/test/product/stats]}: getProductsStats()
+	{DELETE [/api/test/product/clear]}: clearProducts()
+2026-04-22 20:35:10.616 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.t.c.u.UserTestDataController:
+	{POST [/api/test/users/generate]}: generateTestSellers(int)
+	{GET [/api/test/users/stats]}: getTestUsersStats()
+	{GET [/api/test/users/list]}: listTestUsers()
+	{DELETE [/api/test/users/clear]}: clearTestUsers()
+2026-04-22 20:35:10.617 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.c.c.CommentAdminApiController:
+	{DELETE [/api/admin/comments/{commentId}]}: deleteComment(Long)
+2026-04-22 20:35:10.619 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.c.c.CommentApiController:
+	{DELETE [/api/comments/{commentId}]}: deleteComment(Long)
+	{PUT [/api/comments/{commentId}]}: updateComment(Long,UpdateCommentRequest)
+	{POST [/api/comments]}: createComment(CreateCommentRequest)
+2026-04-22 20:35:10.622 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.c.c.CommentPublicApiController:
+	{GET [/api/public/comments/product/{sku}]}: getCommentsByProductSku(String,Pageable)
+	{GET [/api/public/comments/{commentId}]}: getCommentById(Long)
+	{GET [/api/public/comments/product/{sku}/rating]}: getAverageRating(String)
+2026-04-22 20:35:10.626 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	r.d.d.c.DiscountAdminController:
+	{POST [/api/admin/discounts]}: createDiscount(CreateDiscountRequest)
+	{PATCH [/api/admin/discounts/{code}/deactivate]}: deactivateDiscount(String)
+	{GET [/api/admin/discounts/{code}]}: getDiscountByCode(String)
+	{PATCH [/api/admin/discounts/{code}/activate]}: activateDiscount(String,Integer)
+	{GET [/api/admin/discounts]}: getAllDiscounts()
+2026-04-22 20:35:10.629 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	o.s.b.w.a.e.BasicErrorController:
+	{ [/error]}: error(HttpServletRequest)
+	{ [/error], produces [text/html]}: errorHtml(HttpServletRequest,HttpServletResponse)
+2026-04-22 20:35:10.649 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	o.s.w.a.OpenApiWebMvcResource:
+	{GET [/v3/api-docs], produces [application/json]}: openapiJson(HttpServletRequest,String,Locale)
+	{GET [/v3/api-docs.yaml], produces [application/vnd.oai.openapi]}: openapiYaml(HttpServletRequest,String,Locale)
+2026-04-22 20:35:10.652 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	o.s.w.u.SwaggerWelcomeWebMvc:
+	{GET [/swagger-ui.html]}: redirectToUi(HttpServletRequest)
+2026-04-22 20:35:10.653 [main] TRACE o.s.w.s.m.m.a.RequestMappingHandlerMapping - 
+	o.s.w.u.SwaggerConfigResource:
+	{GET [/v3/api-docs/swagger-config], produces [application/json]}: openapiJson(HttpServletRequest)
+2026-04-22 20:35:10.657 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 91 mappings in 'requestMappingHandlerMapping'
+2026-04-22 20:35:10.712 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**, /js/**, /uploads/users/**, /uploads/products/**, /swagger-ui/**, /swagger-ui/*swagger-initializer.js, /webjars/*swagger-ui/**, /webjars/*swagger-ui/*swagger-initializer.js, /webjars/*swagger-ui/5.32.0/*swagger-initializer.js] in 'resourceHandlerMapping'
+2026-04-22 20:35:10.764 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 2 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-04-22 20:35:10.829 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-04-22 20:35:10.870 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 2 @ExceptionHandler, 0 ResponseBodyAdvice
+2026-04-22 20:35:11.426 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-04-22 20:35:11.466 [main] INFO  r.d.app.BulletinBoardApplication - Started BulletinBoardApplication in 10.903 seconds (process running for 11.395)
+2026-04-22 20:35:11.470 [main] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-04-22 20:35:11.471 [main] WARN  o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-04-22 20:48:17.008 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-22 20:48:17.014 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

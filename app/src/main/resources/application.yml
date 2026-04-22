@@ -47,3 +47,9 @@ logging:
     org.springframework.web.client.RestTemplate: INFO
     org.springframework.boot.web.servlet: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
+
+#dotenv
+dotenv:
+  enabled: ${DOTENV_ENABLED:true}
+  path: ${DOTENV_PATH:}
+  filename: ${DOTENV_FILENAME:.env}
